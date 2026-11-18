@@ -1,0 +1,32 @@
+# Documentation & Agent instructions
+*.md
+.agents/
+.agents
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!client/.env.example
+!server/.env.example
+client/.env
+client/.env.*
+server/.env
+server/.env.*
+
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds & caches
+dist/
+build/
+client/dist/
+server/dist/
+*.tsbuildinfo
+.vite/
+.vite-temp/
+
+# Tool and test temporary caches
+testsprite_tests/
