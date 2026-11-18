@@ -1,0 +1,69 @@
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-padding-top: 80px;
+    background-color: var(--color-surface-base);
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-surface-base);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-stack);
+    font-size: var(--font-size-base);
+    line-height: var(--font-lineHeight-base);
+    font-weight: var(--font-weight-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* Accessibility — Skip Navigation Link */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: var(--space-2);
+    z-index: 1000;
+    background: var(--color-text-secondary);
+    color: var(--color-surface-base);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: top var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+
+  .skip-link:focus-visible {
+    top: var(--space-2);
+    box-shadow: var(--shadow-focus);
+    outline: 2px solid transparent;
+  }
+
+  /* Accessibility — Focus Rings */
+  *:focus-visible {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-focus) !important;
+  }
+
+  /* Card Stretched Link Architecture (1 Tab Stop per Card) */
+  .card-stretched-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Focus indicator on parent card when child stretched link receives focus */
+  article:has(.card-stretched-link:focus-visible) {
+    box-shadow: var(--shadow-focus);
+    border-color: var(--color-border-focus);
+  }
+}
