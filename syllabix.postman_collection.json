@@ -1,0 +1,420 @@
+{
+  "info": {
+    "_postman_id": "a9e6d012-42f1-4b17-a068-syllabix-v1",
+    "name": "Syllabix Academic Platform API",
+    "description": "Full end-to-end API test suite for Syllabix: MERN + Supabase Auth/Storage/Realtime + Google Gemini RAG, Realtime Study Rooms, Mentorship, Discussions, Gamification, and Institutional Analytics.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Academic Hierarchy",
+      "item": [
+        {
+          "name": "Get Institutions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/institutions",
+              "host": ["{{baseUrl}}"],
+              "path": ["institutions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Curriculum Subjects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["subjects"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI Study Assistant (Gemini)",
+      "item": [
+        {
+          "name": "Grounded AI Query (Gemini 3.8 Flash)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Explain AVL tree balance factors and double rotations with exam diagrams in CS-201.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/study-assistant/query",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "study-assistant", "query"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Curriculum Summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Unit 2: Process synchronization, thread scheduling, CPU scheduling, virtual memory paging, deadlock avoidance, and kernel architecture.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/summarize",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "summarize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Practice Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectName\": \"Data Structures & Algorithms\",\n  \"context\": \"Trees and Graphs\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/quiz",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "quiz"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Real-Time Collaborative Study Rooms",
+      "item": [
+        {
+          "name": "List All Study Rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-groups",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-groups"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Study Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CS-201 Dynamic Programming Circle\",\n  \"subjectId\": \"{{subjectId}}\",\n  \"schedule\": \"Daily 7:00 PM - 9:00 PM IST\",\n  \"activeTopic\": \"Unit 2: Longest Common Subsequence\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/study-groups",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-groups"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Study Room Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-groups/{{studyGroupId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-groups", "{{studyGroupId}}", "messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Post Message in Study Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Has anyone verified the base cases for question 3 in midterm 2025?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/study-groups/{{studyGroupId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-groups", "{{studyGroupId}}", "messages"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Senior-Junior Mentorship",
+      "item": [
+        {
+          "name": "List Verified Mentors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mentors",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Mentorship Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentorUserId\": \"{{mentorUserId}}\",\n  \"subjectId\": \"{{subjectId}}\",\n  \"message\": \"Need 1-on-1 guidance on deadlock avoidance and Banker's algorithm invariance proof.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mentors/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors", "request"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Community Doubts & Discussions",
+      "item": [
+        {
+          "name": "List Discussions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["discussions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Post Academic Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectId\": \"{{subjectId}}\",\n  \"title\": \"How to prove Peterson's Algorithm satisfies bounded waiting?\",\n  \"body\": \"Can someone provide the formal invariance proof that process P_i will enter the critical section after at most one turn of process P_j?\",\n  \"tags\": [\"concurrency\", \"os\", \"unit-2\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["discussions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Post Answer / Solution",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Peterson's algorithm achieves bounded waiting because once P_j exits the critical section, it resets flag[j] to false, immediately releasing P_i from its busy-wait loop.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/discussions/{{discussionId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["discussions", "{{discussionId}}", "comments"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Gamification & Leaderboard",
+      "item": [
+        {
+          "name": "Get Contributor Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/gamification/leaderboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["gamification", "leaderboard"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Institutional Analytics",
+      "item": [
+        {
+          "name": "Get Institutional Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "overview"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Syllabus Coverage & Gaps",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/coverage/{{subjectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "coverage", "{{subjectId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "demo-bearer-token",
+      "type": "string"
+    },
+    {
+      "key": "subjectId",
+      "value": "650000000000000000000001",
+      "type": "string"
+    },
+    {
+      "key": "studyGroupId",
+      "value": "room-1",
+      "type": "string"
+    },
+    {
+      "key": "mentorUserId",
+      "value": "u_mentor1",
+      "type": "string"
+    },
+    {
+      "key": "discussionId",
+      "value": "d1",
+      "type": "string"
+    }
+  ]
+}
