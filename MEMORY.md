@@ -89,7 +89,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 28:** Ensure Deterministic AI Synthesis Fallback (COMPLETED - guaranteed complete, structured responses for Chatbot, Summary, Quiz, and Flashcards in offline/fallback mode with exact count guarantees across all subjects)
 - [x] **Task 29:** Optimize Context Window & Chunk Selection (COMPLETED - fingerprint deduplication, multi-document source diversity balancing, per-chunk clamping to 1500 chars, and global context budget enforcement)
 - [x] **Phase 8 (Tasks 25–29):** AI Study Assistant Optimization (COMPLETED)
-- [ ] **Task 30:** Initialize User Profile on First Login (`server/src/controllers/authController.ts`)
+- [x] **Task 30:** Initialize User Profile on First Login (COMPLETED - auto-bootstrapping on initial auth, explicit sync endpoint, populated academic relations, offline fallback)
 - [ ] **Task 31:** Handle Backend Unavailable in Client API (`client/src/lib/api.ts`)
 - [ ] **Tasks 32–33:** Mentorship Booking Feedback & Notification Badge Counter
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory Filters
@@ -98,11 +98,10 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. User profile synchronization needs seamless first-login creation in MongoDB when users register via Supabase Auth.
-2. Client API needs graceful handling when the backend server is temporarily offline.
+1. Client API needs graceful handling and consistent fallback when the backend server is temporarily offline.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 29: Optimize Context Window and Chunk Selection (`server/src/controllers/aiController.ts`, `server/src/services/geminiService.ts`).
-- **Immediate Next Task:** Task 30: Initialize User Profile on First Login (`server/src/controllers/authController.ts`).
+- **Current Task:** Completed Task 30: Initialize User Profile on First Login (`server/src/controllers/authController.ts`).
+- **Immediate Next Task:** Task 31: Handle Backend Unavailable in Client API (`client/src/lib/api.ts`).

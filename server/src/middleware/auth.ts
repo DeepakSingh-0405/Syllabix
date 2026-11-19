@@ -99,19 +99,32 @@ export const verifySupabaseToken = async (
 
     req.supabaseUser = user;
 
-    // Synchronize / find user in MongoDB
-    let dbUser = await User.findOne({ supabaseUserId: user.id });
+    // Synchronize / find user in MongoDB with resilient error handling
+    let dbUser: any = null;
+    try {
+      dbUser = await User.findOne({ supabaseUserId: user.id });
 
-    if (!dbUser) {
-      // First-time user bootstrap
-      dbUser = await User.create({
+      if (!dbUser) {
+        // First-time user bootstrap
+        dbUser = await User.create({
+          supabaseUserId: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student',
+          avatarUrl: user.user_metadata?.avatar_url || '',
+          role: 'student',
+          reputationPoints: 0,
+        });
+      }
+    } catch (dbErr) {
+      console.warn('[AuthMiddleware] Database offline or error finding/creating user in MongoDB:', dbErr);
+      dbUser = {
+        _id: new mongoose.Types.ObjectId('650000000000000000000099'),
         supabaseUserId: user.id,
-        email: user.email || '',
+        email: user.email || 'student@syllabix.edu',
         name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student',
-        avatarUrl: user.user_metadata?.avatar_url || '',
         role: 'student',
         reputationPoints: 0,
-      });
+      };
     }
 
     req.user = dbUser;

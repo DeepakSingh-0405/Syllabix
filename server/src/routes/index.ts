@@ -53,6 +53,7 @@ router.get('/health', (_req, res) => {
 
 // Auth & Users
 router.get('/users/me', verifySupabaseToken, authController.getMe);
+router.post('/users/sync', verifySupabaseToken, authController.syncProfile);
 router.patch('/users/profile', verifySupabaseToken, authController.updateProfile);
 
 // Academic Hierarchy & Syllabus
