@@ -117,6 +117,79 @@ export function calculateCoverageMetrics(input: CoverageCalculationInput): Cover
   };
 }
 
+export interface RawLeaderboardUser {
+  _id: any;
+  name?: string;
+  email?: string;
+  avatarUrl?: string;
+  role?: string;
+  reputationPoints?: number;
+  createdAt?: Date;
+}
+
+export interface RankedLeaderboardEntry {
+  rank: number;
+  _id: string;
+  name: string;
+  role: string;
+  reputationPoints: number;
+  badge: string;
+  tier: 'diamond' | 'gold' | 'silver' | 'bronze';
+}
+
+/**
+ * Normalizes leaderboard users with deterministic tie-breaking,
+ * 1-based standard competition ranks, and appropriate achievement badges.
+ */
+export function assignLeaderboardRanks(users: RawLeaderboardUser[]): RankedLeaderboardEntry[] {
+  const sorted = [...users].sort((a, b) => {
+    const ptsA = a.reputationPoints || 0;
+    const ptsB = b.reputationPoints || 0;
+    if (ptsB !== ptsA) return ptsB - ptsA;
+
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (dateA !== dateB && dateA > 0 && dateB > 0) return dateA - dateB;
+
+    return String(a._id).localeCompare(String(b._id));
+  });
+
+  let currentRank = 1;
+  return sorted.map((user, idx) => {
+    const points = user.reputationPoints || 0;
+    if (idx > 0) {
+      const prevPoints = sorted[idx - 1].reputationPoints || 0;
+      if (points < prevPoints) {
+        currentRank = idx + 1;
+      }
+    }
+
+    let badge = 'Novice Scholar';
+    let tier: 'diamond' | 'gold' | 'silver' | 'bronze' = 'bronze';
+
+    if (points >= 150) {
+      badge = 'Curriculum Pioneer';
+      tier = 'diamond';
+    } else if (points >= 80) {
+      badge = 'Senior Mentor';
+      tier = 'gold';
+    } else if (points >= 30) {
+      badge = 'Doubt Solver';
+      tier = 'silver';
+    }
+
+    return {
+      rank: currentRank,
+      _id: String(user._id),
+      name: user.name || 'Anonymous Scholar',
+      role: user.role || 'student',
+      reputationPoints: points,
+      badge,
+      tier,
+    };
+  });
+}
+
 /**
  * GET /api/v1/gamification/leaderboard
  * Returns top academic contributors ranked by reputation points with earned badges
@@ -124,51 +197,26 @@ export function calculateCoverageMetrics(input: CoverageCalculationInput): Cover
 export const getLeaderboard = async (_req: Request, res: Response) => {
   try {
     const topUsers = await User.find({})
-      .sort({ reputationPoints: -1 })
-      .limit(15)
+      .sort({ reputationPoints: -1, createdAt: 1, _id: 1 })
+      .limit(25)
       .select('name email avatarUrl role reputationPoints createdAt')
       .lean()
       .catch(() => []);
 
-    // Map users to academic gamification rankings and achievement badges
-    const leaderboard = topUsers.map((user, idx) => {
-      const points = user.reputationPoints || 0;
-      let badge = 'Novice Scholar';
-      let tier = 'bronze';
-
-      if (points >= 150) {
-        badge = 'Curriculum Pioneer';
-        tier = 'diamond';
-      } else if (points >= 80) {
-        badge = 'Senior Mentor';
-        tier = 'gold';
-      } else if (points >= 30) {
-        badge = 'Doubt Solver';
-        tier = 'silver';
-      }
-
-      return {
-        rank: idx + 1,
-        _id: user._id,
-        name: user.name || 'Anonymous Scholar',
-        role: user.role,
-        reputationPoints: points,
-        badge,
-        tier,
-      };
-    });
+    const leaderboard = assignLeaderboardRanks(topUsers);
 
     // Provide default academic scholars if the DB is fresh
     if (leaderboard.length === 0) {
+      const defaultScholars: RawLeaderboardUser[] = [
+        { _id: 'u1', name: 'Aarav Mehta', role: 'student', reputationPoints: 185 },
+        { _id: 'u2', name: 'Prof. Aryan Sharma', role: 'faculty', reputationPoints: 140 },
+        { _id: 'u3', name: 'Sneha Patel', role: 'student', reputationPoints: 95 },
+        { _id: 'u4', name: 'Rohan Verma', role: 'student', reputationPoints: 65 },
+        { _id: 'u5', name: 'Divya Iyer', role: 'student', reputationPoints: 45 },
+      ];
       return res.json({
         success: true,
-        data: [
-          { rank: 1, _id: 'u1', name: 'Aarav Mehta', role: 'student', reputationPoints: 185, badge: 'Curriculum Pioneer', tier: 'diamond' },
-          { rank: 2, _id: 'u2', name: 'Prof. Aryan Sharma', role: 'faculty', reputationPoints: 140, badge: 'Senior Mentor', tier: 'gold' },
-          { rank: 3, _id: 'u3', name: 'Sneha Patel', role: 'student', reputationPoints: 95, badge: 'Senior Mentor', tier: 'gold' },
-          { rank: 4, _id: 'u4', name: 'Rohan Verma', role: 'student', reputationPoints: 65, badge: 'Doubt Solver', tier: 'silver' },
-          { rank: 5, _id: 'u5', name: 'Divya Iyer', role: 'student', reputationPoints: 45, badge: 'Doubt Solver', tier: 'silver' },
-        ],
+        data: assignLeaderboardRanks(defaultScholars),
       });
     }
 

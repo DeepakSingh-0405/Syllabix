@@ -76,8 +76,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Phase 5 (Tasks 16–17):** Document Upload & Ingestion Pipeline (COMPLETED)
 - [x] **Task 18:** Align Verified Resource Query (COMPLETED - replaced non-existent verificationStatus with verifiedResourceFilter for isVerified and legacy fallbacks)
 - [x] **Task 19:** Compute Accurate Coverage Metrics (COMPLETED - implemented calculateCoverageMetrics with zero-topic/missing-unit safety and descriptive status)
-- [ ] **Task 20:** Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`)
-- [ ] **Tasks 21–24:** Database & Backend Reliability
+- [x] **Task 20:** Normalize Leaderboard Ranking (COMPLETED - deterministic tie-breaking, 1-based competition ranks, and badge/tier alignment)
+- [x] **Phase 6 (Tasks 18–20):** Analytics Dashboard & Leaderboard Rankings (COMPLETED)
+- [ ] **Task 21:** Ensure Idempotent Database Seed (`server/src/config/seed.ts`)
+- [ ] **Task 22:** Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`)
+- [ ] **Task 23:** Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`)
+- [ ] **Task 24:** Expand Health Check Status (`server/src/routes/index.ts`)
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory
@@ -86,12 +90,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Leaderboard rankings need deterministic tie-breaking and 1-based indexing.
-2. Database seed needs idempotency checks to prevent duplicate records.
-3. Study group creation needs authentic user ownership assignment.
+1. Database seed needs idempotency checks to prevent duplicate records on repeated restarts.
+2. Study group creation needs authentic user ownership assignment.
+3. MongoDB disconnect handling needs graceful auto-recovery and health reporting.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 19: Compute Accurate Coverage Metrics (`server/src/controllers/analyticsController.ts`).
-- **Immediate Next Task:** Task 20: Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`).
+- **Current Task:** Completed Task 20: Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`).
+- **Immediate Next Task:** Task 21: Ensure Idempotent Database Seed (`server/src/config/seed.ts`).
