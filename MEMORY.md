@@ -56,7 +56,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 01:** Fix PDF Document Parsing (COMPLETED - integrated pdf-parse v2 PDFParse class)
 - [x] **Task 02:** Normalize API Response Contract (COMPLETED - leaderboard & analytics responses standardized)
 - [x] **Task 03:** Fix Demo Authentication Session Handling in `api.ts` (COMPLETED - demo session resolution & write guard)
-- [ ] **Task 04:** Fix Demo Token Security (Strict production restriction)
+- [x] **Task 04:** Fix Demo Token Security (COMPLETED - strict production restriction & exact token whitelist)
+- [ ] **Task 05:** Fix Mentorship Chat Authorization
 - [ ] **Task 03:** Fix Demo Authentication Session Handling
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
@@ -80,5 +81,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 03: Fix Demo Authentication Session Handling.
-- **Immediate Next Task:** Task 04: Fix Demo Token Security (ensure demo tokens are strictly rejected in production runtime) in `server/src/middleware/auth.ts`.
+- **Current Task:** Completed Task 04: Fix Demo Token Security.
+- **Immediate Next Task:** Task 05: Fix Mentorship Chat Authorization in `server/src/controllers/mentorshipController.ts`.

@@ -9,6 +9,24 @@ export interface AuthenticatedRequest extends Request {
   supabaseUser?: any;
 }
 
+const ALLOWED_DEMO_TOKENS = new Set(['demo-bearer-token']);
+
+export const isDemoToken = (token: string): boolean => {
+  return ALLOWED_DEMO_TOKENS.has(token);
+};
+
+export const isDemoAuthenticationPermitted = (): boolean => {
+  // If NODE_ENV is production, NEVER permit demo tokens under any circumstances, even if ALLOW_DEMO_TOKENS is true
+  if (process.env.NODE_ENV === 'production' || env.NODE_ENV === 'production') {
+    return false;
+  }
+  // In development and test environments, check explicit configuration
+  if (process.env.ALLOW_DEMO_TOKENS !== undefined) {
+    return process.env.ALLOW_DEMO_TOKENS === 'true';
+  }
+  return env.ALLOW_DEMO_TOKENS !== false;
+};
+
 export const verifySupabaseToken = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -29,10 +47,19 @@ export const verifySupabaseToken = async (
 
     const token = authHeader.split(' ')[1];
 
-    const isDemoAllowed = env.NODE_ENV !== 'production' || env.ALLOW_DEMO_TOKENS;
+    // Handle demo tokens with strict environment enforcement
+    if (isDemoToken(token)) {
+      if (!isDemoAuthenticationPermitted()) {
+        res.status(401).json({
+          success: false,
+          error: {
+            code: 'DEMO_TOKENS_FORBIDDEN',
+            message: 'Demo authentication is forbidden in production environments.',
+          },
+        });
+        return;
+      }
 
-    // Support demo/local testing tokens only in non-production environments
-    if (isDemoAllowed && (token === 'demo-bearer-token' || token.startsWith('demo-'))) {
       const demoId = 'demo-student-id-001';
       let demoUser: any = null;
       try {
@@ -111,18 +138,25 @@ export const optionalSupabaseToken = async (
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const isDemoAllowed = env.NODE_ENV !== 'production' || env.ALLOW_DEMO_TOKENS;
-      if (isDemoAllowed && (token === 'demo-bearer-token' || token.startsWith('demo-'))) {
-        let demoUser = await User.findOne({ supabaseUserId: 'demo-student-id-001' });
-        if (!demoUser) {
-          demoUser = await User.create({
-            _id: new mongoose.Types.ObjectId('650000000000000000000001'),
-            supabaseUserId: 'demo-student-id-001',
-            email: 'student@syllabix.edu',
-            name: 'Aarav Mehta (Student)',
-            role: 'student',
-            reputationPoints: 120,
-          }).catch(() => null);
+      if (isDemoToken(token)) {
+        if (!isDemoAuthenticationPermitted()) {
+          return next();
+        }
+        let demoUser: any = null;
+        try {
+          demoUser = await User.findOne({ supabaseUserId: 'demo-student-id-001' });
+          if (!demoUser) {
+            demoUser = await User.create({
+              _id: new mongoose.Types.ObjectId('650000000000000000000001'),
+              supabaseUserId: 'demo-student-id-001',
+              email: 'student@syllabix.edu',
+              name: 'Aarav Mehta (Student)',
+              role: 'student',
+              reputationPoints: 120,
+            }).catch(() => null);
+          }
+        } catch {
+          // DB offline fallback
         }
         req.user = demoUser || ({ _id: new mongoose.Types.ObjectId('650000000000000000000001'), name: 'Aarav Mehta (Student)', role: 'student', reputationPoints: 120 } as any);
         return next();

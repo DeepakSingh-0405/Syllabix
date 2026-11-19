@@ -149,7 +149,77 @@ async function runTests() {
     console.log('[PASS] Test 4: Client token resolution and session expiration logic verified.');
   }
 
-  console.log('ALL AUTHENTICATION TESTS PASSED (4/4)!');
+  // Test 5: verifySupabaseToken strictly rejects demo tokens in production
+  {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    let nextCalled = false;
+    let statusCode: number | null = null;
+    let jsonPayload: any = null;
+
+    const req: any = {
+      headers: {
+        authorization: 'Bearer demo-bearer-token',
+      },
+    };
+    const res: any = {
+      status: (code: number) => {
+        statusCode = code;
+        return res;
+      },
+      json: (payload: any) => {
+        jsonPayload = payload;
+        return res;
+      },
+    };
+    const next = () => {
+      nextCalled = true;
+    };
+
+    try {
+      await verifySupabaseToken(req, res, next);
+      assert.strictEqual(nextCalled, false, 'Next must not be called for demo token in production');
+      assert.strictEqual(statusCode, 401, 'Status code must be 401 in production');
+      assert.strictEqual(jsonPayload.error.code, 'DEMO_TOKENS_FORBIDDEN', 'Error code must be DEMO_TOKENS_FORBIDDEN');
+      console.log('[PASS] Test 5: verifySupabaseToken strictly rejects demo tokens in production.');
+    } finally {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
+  }
+
+  // Test 6: Arbitrary demo- prefixes are never allowed to bypass authentication
+  {
+    let nextCalled = false;
+    let statusCode: number | null = null;
+    let jsonPayload: any = null;
+
+    const req: any = {
+      headers: {
+        authorization: 'Bearer demo-arbitrary-attacker-token',
+      },
+    };
+    const res: any = {
+      status: (code: number) => {
+        statusCode = code;
+        return res;
+      },
+      json: (payload: any) => {
+        jsonPayload = payload;
+        return res;
+      },
+    };
+    const next = () => {
+      nextCalled = true;
+    };
+
+    await verifySupabaseToken(req, res, next);
+    assert.strictEqual(nextCalled, false, 'Next must not be called for arbitrary demo prefix');
+    assert.strictEqual(statusCode, 401, 'Status code must be 401 for arbitrary demo token');
+    console.log('[PASS] Test 6: Arbitrary demo- prefixes cannot bypass authentication.');
+  }
+
+  console.log('ALL AUTHENTICATION TESTS PASSED (6/6)!');
 }
 
 runTests().catch((err) => {

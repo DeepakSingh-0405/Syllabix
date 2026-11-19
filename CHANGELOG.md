@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [Unreleased]
+### Security
+- Restricted demo authentication in `server/src/middleware/auth.ts`: enforced strict production rejection regardless of environment overrides and eliminated arbitrary prefix bypasses with exact token whitelisting.
+
 ### Fixed
 - Repaired demo and Supabase session handling in `client/src/lib/api.ts` with local session expiration verification and eliminated anonymous user impersonation on write operations.
 - Normalized API response contracts in `server/src/controllers/analyticsController.ts` and `client/src/lib/api.ts` to consistently wrap and unwrap `{ success: true, data: ... }`, ensuring leaderboard and institutional analytics render properly.
