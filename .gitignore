@@ -1,5 +1,11 @@
-# Documentation & Agent instructions
-*.md
+# Documentation files
+!README.md
+!MEMORY.md
+!CONTRIBUTING.md
+!SECURITY.md
+!CHANGELOG.md
+!docs/**
+!.github/**
 .agents/
 .agents
 
