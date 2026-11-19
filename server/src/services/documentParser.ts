@@ -13,6 +13,8 @@ export interface ParseResult {
   totalPages: number;
   totalTextLength: number;
   chunks: ParsedChunk[];
+  isEmpty?: boolean;
+  warning?: string;
 }
 
 /**
@@ -32,6 +34,8 @@ export async function parseDocumentBuffer(
       totalPages: 1,
       totalTextLength: 0,
       chunks: [],
+      isEmpty: true,
+      warning: 'Buffer is empty; no text content available.',
     };
   }
 
@@ -67,6 +71,8 @@ export async function parseDocumentBuffer(
       totalPages: 1,
       totalTextLength: 0,
       chunks: [],
+      isEmpty: true,
+      warning: 'No readable text content extracted from document.',
     };
   }
 
@@ -78,30 +84,53 @@ export async function parseDocumentBuffer(
   // Approximate page distribution
   const charsPerPage = Math.max(Math.floor(cleanText.length / Math.max(totalPages, 1)), 1);
 
-  while (startIndex < cleanText.length) {
-    const endIndex = Math.min(startIndex + chunkSize, cleanText.length);
-    let chunkText = cleanText.substring(startIndex, endIndex).trim();
+  if (cleanText.length <= 50) {
+    // Retain short documents (e.g. syllabus headers, single-sentence memos)
+    const sectionTitle = cleanText.split('\n')[0]?.trim() || 'Course Document Note';
+    chunks.push({
+      chunkIndex: 0,
+      pageNumber: 1,
+      textContent: cleanText,
+      tokenCount: Math.ceil(cleanText.length / 4),
+      sectionTitle,
+    });
+  } else {
+    while (startIndex < cleanText.length) {
+      const endIndex = Math.min(startIndex + chunkSize, cleanText.length);
+      let chunkText = cleanText.substring(startIndex, endIndex).trim();
 
-    if (chunkText.length > 50) { // filter out negligible fragments
-      const approxPage = Math.min(Math.floor(startIndex / charsPerPage) + 1, totalPages);
+      if (chunkText.length > 50) { // filter out negligible fragments
+        const approxPage = Math.min(Math.floor(startIndex / charsPerPage) + 1, totalPages);
 
-      // Attempt to extract section title from first capitalized line
-      const firstLine = chunkText.split('\n')[0]?.trim() || '';
-      const sectionTitle = firstLine.length < 80 ? firstLine : `Page ${approxPage} Content`;
+        // Attempt to extract section title from first capitalized line
+        const firstLine = chunkText.split('\n')[0]?.trim() || '';
+        const sectionTitle = firstLine.length < 80 ? firstLine : `Page ${approxPage} Content`;
 
-      chunks.push({
-        chunkIndex,
-        pageNumber: approxPage,
-        textContent: chunkText,
-        tokenCount: Math.ceil(chunkText.length / 4), // standard approximation ~4 chars / token
-        sectionTitle,
-      });
+        chunks.push({
+          chunkIndex,
+          pageNumber: approxPage,
+          textContent: chunkText,
+          tokenCount: Math.ceil(chunkText.length / 4), // standard approximation ~4 chars / token
+          sectionTitle,
+        });
 
-      chunkIndex++;
+        chunkIndex++;
+      }
+
+      if (endIndex >= cleanText.length) break;
+      startIndex += (chunkSize - overlap);
     }
 
-    if (endIndex >= cleanText.length) break;
-    startIndex += (chunkSize - overlap);
+    // Safety fallback: ensure at least one chunk exists if cleanText was non-empty
+    if (chunks.length === 0 && cleanText.length > 0) {
+      chunks.push({
+        chunkIndex: 0,
+        pageNumber: 1,
+        textContent: cleanText,
+        tokenCount: Math.ceil(cleanText.length / 4),
+        sectionTitle: 'Course Document Excerpt',
+      });
+    }
   }
 
   return {

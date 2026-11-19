@@ -85,7 +85,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Phase 7 (Tasks 21–24):** Database & Backend Reliability (COMPLETED)
 - [x] **Task 25:** Enforce Model Configuration (COMPLETED - canonical gemini-1.5-flash & text-embedding-004 models, zero non-existent model strings)
 - [x] **Task 26:** Normalize Gemini API Error Handling (COMPLETED - GeminiApiError & parseGeminiError handling 429, 403, 503, timeouts with seamless fallback)
-- [ ] **Task 27:** Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`)
+- [x] **Task 27:** Handle Empty Document Extraction Gracefully (COMPLETED - isEmpty flag, preserved short texts, descriptive ingestion fallback chunks)
 - [ ] **Task 28:** Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`)
 - [ ] **Task 29:** Optimize Context Window & Chunk Selection (`server/src/services/geminiService.ts`)
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
@@ -95,11 +95,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Empty or non-text document uploads need graceful fallback parsing and notification.
-2. Context window chunk selection needs budget management for large document corpora.
+1. Deterministic curriculum synthesis fallback needs verified grounding across all 4 student learning modalities.
+2. Context window chunk selection needs budget enforcement and deduplication.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 26: Normalize Gemini API Error Handling (`server/src/services/geminiService.ts`).
-- **Immediate Next Task:** Task 27: Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`).
+- **Current Task:** Completed Task 27: Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`).
+- **Immediate Next Task:** Task 28: Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`).

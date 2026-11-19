@@ -54,6 +54,20 @@ export async function processDocumentIngestion(resourceId: string): Promise<bool
     const parsedDoc = await parseDocumentBuffer(fileBuffer, resource.mimeType);
     console.log(`[IngestionWorker] Extracted ${parsedDoc.chunks.length} chunks across ${parsedDoc.totalPages} pages.`);
 
+    // If document produced zero text chunks (e.g. empty or scanned image PDF),
+    // generate a descriptive syllabus metadata chunk so the document remains searchable.
+    if (parsedDoc.chunks.length === 0) {
+      console.warn(`[IngestionWorker] Document for "${resource.title}" contained no extractable text. Creating descriptive fallback chunk.`);
+      const fallbackText = `${resource.title}\n\n${resource.description || 'Academic course document.'}\n\nNote: This document contains visual, tabular, or unindexed syllabus content. Consult original document file for full details.`;
+      parsedDoc.chunks.push({
+        chunkIndex: 0,
+        pageNumber: 1,
+        textContent: fallbackText,
+        tokenCount: Math.ceil(fallbackText.length / 4),
+        sectionTitle: resource.title || 'Course Document Overview',
+      });
+    }
+
     // Clear any previous chunks for this resource
     await DocumentChunk.deleteMany({ resourceId: resource._id });
 
