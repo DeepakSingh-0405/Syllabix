@@ -1,14 +1,15 @@
 import React from 'react';
 import { Subject } from '../types';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, BookMarked, Layers } from 'lucide-react';
+import { ArrowUpRight, BookMarked, Layers, Upload } from 'lucide-react';
 
 interface SyllabusCardProps {
   subject: Subject;
   onOpenDetails: (subject: Subject) => void;
+  onOpenUpload?: (subject: Subject) => void;
 }
 
-export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetails }) => {
+export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetails, onOpenUpload }) => {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -28,6 +29,22 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
               {subject.code}
             </span>
             <div className="flex items-center gap-2 text-text-tertiary">
+              {onOpenUpload && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onOpenUpload(subject);
+                  }}
+                  className="relative z-20 inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary hover:text-accent-strong py-0.5 px-1.5 rounded hover:bg-surface-base border border-transparent hover:border-border-default transition-all"
+                  title={`Upload syllabus for ${subject.code}`}
+                  aria-label={`Upload syllabus for ${subject.code}`}
+                >
+                  <Upload className="w-3 h-3" />
+                  <span>Upload</span>
+                </button>
+              )}
               <span className="text-[12px]">Sem {subject.semester}</span>
               {subject.isCore && (
                 <span className="rounded-full border border-accent-green/20 bg-accent-green/10 px-2 py-0.5 text-[11px] font-medium text-accent-green">

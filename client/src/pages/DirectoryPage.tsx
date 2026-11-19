@@ -330,6 +330,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
                 key={subject._id || subject.code}
                 subject={subject}
                 onOpenDetails={(sub) => setSelectedDetailsSubject(sub)}
+                onOpenUpload={onOpenUpload}
               />
             ))}
           </ul>
@@ -369,6 +370,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
         onOpenFlashcards={(sub) => {
           setFlashcardSubject(sub);
         }}
+        onOpenUpload={onOpenUpload}
       />
 
       {/* Flashcard Deck Modal */}

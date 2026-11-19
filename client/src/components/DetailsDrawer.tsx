@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Subject } from '../types';
 import { api } from '../lib/api';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
-import { X, Sparkles, Layers, RotateCw, CheckCircle2, AlertCircle, HelpCircle, Check, RefreshCw } from 'lucide-react';
+import { X, Sparkles, Layers, RotateCw, CheckCircle2, AlertCircle, HelpCircle, Check, RefreshCw, Upload } from 'lucide-react';
 
 interface DetailsDrawerProps {
   subject: Subject | null;
   onClose: () => void;
   onOpenAssistantForSubject: (subject: Subject) => void;
   onOpenFlashcards: (subject: Subject) => void;
+  onOpenUpload?: (subject: Subject) => void;
 }
 
 interface UnitBreakdownItem {
@@ -48,6 +49,7 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
   onClose,
   onOpenAssistantForSubject,
   onOpenFlashcards,
+  onOpenUpload,
 }) => {
   const [activeTab, setActiveTab] = useState<'syllabus' | 'summary' | 'practice'>('syllabus');
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
@@ -239,6 +241,19 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
             </div>
 
             <div className="pt-4 mt-auto space-y-2">
+              {onOpenUpload && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenUpload(subject);
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-surface-base border border-border-default text-text-secondary font-medium text-[14px] py-2.5 rounded-md hover:bg-surface-interactive hover:border-border-interactive active:scale-[0.98] transition-all focus-visible:shadow-focus"
+                >
+                  <Upload className="w-4 h-4 text-accent" />
+                  <span>Upload syllabus / notes for {subject.code}</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {

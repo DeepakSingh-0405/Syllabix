@@ -96,16 +96,18 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 33:** Add Notification Badge Counter (COMPLETED - reactive numerical badge with 9+ cap, dynamic aria-label, item mark-as-read, click-outside dismissal)
 - [x] **Task 34:** Implement SM-2 Review Interval Scheduling (COMPLETED - pure calculateSM2Review, falsy 0 fix, EF >= 1.3 floor, exact progression math, due date scheduling)
 - [x] **Task 35:** Add Semester and Branch Filters (COMPLETED - multi-dimensional branch/semester filtering, dynamic subject pill scoping, active filter badges, clear controls)
-- [ ] **Task 36:** Link Upload Modal from Subject Page (`client/src/components/SyllabusCard.tsx`, `client/src/components/DetailsDrawer.tsx`)
-- [ ] **Tasks 37–38:** E2E Verification & Release Audit
+- [x] **Task 36:** Link Upload Modal from Subject Page (COMPLETED - pre-populating upload context from syllabus cards and details drawer, preserving A11Y single stretched link)
+- [ ] **Task 37:** Verify End-to-End User Workflows (`tests/fullWorkflowE2E.test.ts`)
+- [ ] **Task 38:** Prepare Production Release Audit (`package.json`, `docs/*`)
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Subject Directory cards and DetailsDrawer need direct "Upload Syllabus / Contribute Document" triggers pre-selecting the active subject.
+1. Final end-to-end user workflow verification across all modules (Task 37).
+2. Production release audit and documentation alignment (Task 38).
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 35: Add Semester and Branch Filters (`client/src/pages/DirectoryPage.tsx`).
-- **Immediate Next Task:** Task 36: Link Upload Modal from Subject Page (`client/src/components/SyllabusCard.tsx`, `client/src/components/DetailsDrawer.tsx`).
+- **Current Task:** Completed Task 36: Link Upload Modal from Subject Page (`client/src/components/UploadModal.tsx`, `client/src/components/SyllabusCard.tsx`, `client/src/components/DetailsDrawer.tsx`).
+- **Immediate Next Task:** Task 37: Verify End-to-End User Workflows (`tests/fullWorkflowE2E.test.ts`).

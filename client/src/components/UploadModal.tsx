@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -58,11 +58,12 @@ export function validateFileSelection(file: { name: string; size: number; type: 
   return { valid: true };
 }
 
-interface UploadModalProps {
+export interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   subjects: Subject[];
   onUploadSuccess: () => void;
+  initialSubject?: Subject | null;
 }
 
 export const UploadModal: React.FC<UploadModalProps> = ({
@@ -70,6 +71,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   onClose,
   subjects,
   onUploadSuccess,
+  initialSubject,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -86,6 +88,26 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialSubject && isOpen) {
+      const match = subjects.find(
+        (s) =>
+          (s._id && s._id === initialSubject._id) ||
+          (s.code && s.code.toUpperCase() === (initialSubject.code || '').toUpperCase())
+      );
+      if (match) {
+        setIsManualSubject(false);
+        setSelectedSubjectId(match._id);
+        setManualSubjectName(match.name);
+        setManualSubjectCode(match.code);
+      } else {
+        setIsManualSubject(true);
+        setManualSubjectName(initialSubject.name || '');
+        setManualSubjectCode(initialSubject.code || '');
+      }
+    }
+  }, [initialSubject, subjects, isOpen]);
 
   if (!isOpen) return null;
 

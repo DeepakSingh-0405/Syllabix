@@ -25,7 +25,13 @@ const AppContent: React.FC = () => {
 
   // Global modals
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [uploadSubject, setUploadSubject] = useState<Subject | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  const handleOpenUpload = (sub?: Subject) => {
+    setUploadSubject(sub || null);
+    setIsUploadOpen(true);
+  };
 
   // Fallback initial curriculum subjects (matching design.md) in case backend is offline
   const fallbackSubjects: Subject[] = useMemo(() => [
@@ -116,7 +122,7 @@ const AppContent: React.FC = () => {
       <CanvasBackground />
 
       <Navbar
-        onOpenUpload={() => setIsUploadOpen(true)}
+        onOpenUpload={() => handleOpenUpload()}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
 
@@ -131,7 +137,7 @@ const AppContent: React.FC = () => {
                 onNavigateToAssistant={(code) => {
                   navigate(`/assistant${code ? `?subject=${code}` : ''}`);
                 }}
-                onOpenUpload={() => setIsUploadOpen(true)}
+                onOpenUpload={handleOpenUpload}
               />
             }
           />
@@ -174,9 +180,13 @@ const AppContent: React.FC = () => {
 
       <UploadModal
         isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
+        onClose={() => {
+          setIsUploadOpen(false);
+          setUploadSubject(null);
+        }}
         subjects={subjects}
         onUploadSuccess={fetchSubjects}
+        initialSubject={uploadSubject}
       />
 
       <AuthModal
