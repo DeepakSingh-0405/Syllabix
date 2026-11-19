@@ -50,12 +50,13 @@ router.post(
       fileName: z.string().optional(),
       mimeType: z.string().optional(),
       fileSizeBytes: z.number().optional(),
+      isPrivate: z.boolean().optional(),
     })
   ),
   resourceController.requestUploadIntent
 );
-router.post('/resources/:id/confirm-upload', optionalSupabaseToken, resourceController.confirmUpload);
-router.get('/resources/:id/download-url', resourceController.getDownloadUrl);
+router.post('/resources/:id/confirm-upload', verifySupabaseToken, resourceController.confirmUpload);
+router.get('/resources/:id/download-url', optionalSupabaseToken, resourceController.getDownloadUrl);
 
 // AI & Study Assistant (Gemini)
 router.post(

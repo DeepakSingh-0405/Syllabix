@@ -17,6 +17,7 @@ export interface IResource extends Document {
   viewCount: number;
   downloadCount: number;
   isVerified: boolean;
+  isPrivate: boolean;
   version: number;
   ratingAverage: number;
   ratingCount: number;
@@ -49,6 +50,7 @@ const ResourceSchema = new Schema<IResource>(
     viewCount: { type: Number, default: 0 },
     downloadCount: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },
+    isPrivate: { type: Boolean, default: false, index: true },
     version: { type: Number, default: 1 },
     ratingAverage: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },

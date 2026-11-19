@@ -58,8 +58,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 03:** Fix Demo Authentication Session Handling in `api.ts` (COMPLETED - demo session resolution & write guard)
 - [x] **Task 04:** Fix Demo Token Security (COMPLETED - strict production restriction & exact token whitelist)
 - [x] **Task 05:** Fix Mentorship Chat Authorization (COMPLETED - participant ownership & 401/403 validation)
-- [ ] **Task 06:** Fix Private Document Access
-- [ ] **Task 03:** Fix Demo Authentication Session Handling
+- [x] **Task 06:** Fix Private Document Access (COMPLETED - private document ownership/admin enforcement & public download access)
+- [ ] **Task 07:** Fix Flashcard Permissions (`server/src/controllers/aiController.ts` - ensure review belongs to deck owner)
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
 - [ ] **Tasks 14–15:** Real-Time Study Room Chat & Presence
@@ -82,5 +82,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 05: Fix Mentorship Chat Authorization.
-- **Immediate Next Task:** Task 06: Fix Private Document Access in `server/src/controllers/resourceController.ts`.
+- **Current Task:** Completed Task 06: Fix Private Document Access.
+- **Immediate Next Task:** Task 07: Fix Flashcard Permissions (`server/src/controllers/aiController.ts` - ensure review belongs to deck owner).

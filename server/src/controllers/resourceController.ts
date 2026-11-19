@@ -77,6 +77,7 @@ export const requestUploadIntent = async (req: AuthenticatedRequest, res: Respon
       fileName,
       mimeType,
       fileSizeBytes,
+      isPrivate,
     } = req.body;
 
     let targetSubject: any = null;
@@ -164,6 +165,7 @@ export const requestUploadIntent = async (req: AuthenticatedRequest, res: Respon
       storagePath,
       mimeType: mimeType || 'application/pdf',
       fileSizeBytes: fileSizeBytes || 0,
+      isPrivate: Boolean(isPrivate),
       status: 'uploading',
     });
 
@@ -196,14 +198,24 @@ export const confirmUpload = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
-    // Verify ownership or moderator role (allow demo/guest fallback user matching)
-    const currentUserId = req.user?._id?.toString() || '650000000000000000000001';
-    if (
-      String(resource.ownerId) !== currentUserId &&
-      String(resource.ownerId) !== '650000000000000000000001' &&
-      req.user?.role !== 'admin'
-    ) {
-      res.status(403).json({ success: false, error: { message: 'Forbidden' } });
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to confirm upload.' },
+      });
+      return;
+    }
+
+    // Verify ownership or administrator role
+    const currentUserId = req.user._id?.toString();
+    const isOwner = currentUserId && String(resource.ownerId) === currentUserId;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Forbidden: only the owner or an admin can confirm this upload.' },
+      });
       return;
     }
 
@@ -231,7 +243,7 @@ export const confirmUpload = async (req: AuthenticatedRequest, res: Response): P
 };
 
 // 4. Generate Time-Limited Signed Download / View URL
-export const getDownloadUrl = async (req: Request, res: Response): Promise<void> => {
+export const getDownloadUrl = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const resource = await Resource.findById(id);
@@ -239,6 +251,29 @@ export const getDownloadUrl = async (req: Request, res: Response): Promise<void>
     if (!resource) {
       res.status(404).json({ success: false, error: { message: 'Resource not found' } });
       return;
+    }
+
+    // Access control for private documents
+    if (resource.isPrivate) {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required to access private resources.' },
+        });
+        return;
+      }
+
+      const currentUserId = req.user._id?.toString();
+      const isOwner = currentUserId && String(resource.ownerId) === currentUserId;
+      const isAdmin = req.user.role === 'admin';
+
+      if (!isOwner && !isAdmin) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'You do not have permission to access this private resource.' },
+        });
+        return;
+      }
     }
 
     // Generate signed URL from Supabase Storage with 15-minute expiration (900 seconds)
