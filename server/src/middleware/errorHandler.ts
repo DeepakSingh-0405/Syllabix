@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
+import { formatSanitizedError } from '../utils/sanitize';
 
 export const validate = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -33,9 +34,12 @@ export const errorHandler = (
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,
-    error: {
-      code: err.code || 'INTERNAL_SERVER_ERROR',
-      message: err.message || 'An unexpected internal server error occurred.',
-    },
+    error: formatSanitizedError(
+      err,
+      statusCode >= 500
+        ? 'An unexpected internal server error occurred.'
+        : err.message,
+      err.code
+    ),
   });
 };

@@ -8,7 +8,7 @@ import { FlashcardDeck, Flashcard } from '../models/Flashcard';
 import { geminiService } from '../services/geminiService';
 import { cacheService } from '../services/redisService';
 import { getCurriculumBySubject, getCurriculumContext } from '../data/curriculumData';
-import { escapeRegex } from '../utils/sanitize';
+import { escapeRegex, formatSanitizedError } from '../utils/sanitize';
 
 /**
  * Helper to gather rich textual context from uploaded documents, chunks, and curriculum knowledge base.
@@ -325,11 +325,7 @@ export const queryStudyAssistant = async (req: AuthenticatedRequest, res: Respon
     console.error('[AIController] Error in queryStudyAssistant:', err);
     res.status(500).json({
       success: false,
-      error: {
-        code: 'AI_SERVICE_UNAVAILABLE',
-        message: err.message || 'AI generation service is currently unavailable.',
-        details: err.stack,
-      },
+      error: formatSanitizedError(err, 'AI generation service is currently unavailable.', 'AI_SERVICE_UNAVAILABLE'),
     });
   }
 };
@@ -383,11 +379,7 @@ export const generateSummary = async (req: AuthenticatedRequest, res: Response):
     console.error('[AIController] Error in generateSummary:', err);
     res.status(500).json({
       success: false,
-      error: {
-        code: 'AI_SERVICE_UNAVAILABLE',
-        message: err.message || 'AI generation service is currently unavailable.',
-        details: err.stack,
-      },
+      error: formatSanitizedError(err, 'AI generation service is currently unavailable.', 'AI_SERVICE_UNAVAILABLE'),
     });
   }
 };
@@ -441,11 +433,7 @@ export const generateQuiz = async (req: AuthenticatedRequest, res: Response): Pr
     console.error('[AIController] Error in generateQuiz:', err);
     res.status(500).json({
       success: false,
-      error: {
-        code: 'AI_SERVICE_UNAVAILABLE',
-        message: err.message || 'AI generation service is currently unavailable.',
-        details: err.stack,
-      },
+      error: formatSanitizedError(err, 'AI generation service is currently unavailable.', 'AI_SERVICE_UNAVAILABLE'),
     });
   }
 };
@@ -570,11 +558,7 @@ export const getOrCreateFlashcardDeck = async (req: AuthenticatedRequest, res: R
     console.error('[AIController] Error in getOrCreateFlashcardDeck:', err);
     res.status(500).json({
       success: false,
-      error: {
-        code: 'AI_SERVICE_UNAVAILABLE',
-        message: err.message || 'AI generation service is currently unavailable.',
-        details: err.stack,
-      },
+      error: formatSanitizedError(err, 'AI generation service is currently unavailable.', 'AI_SERVICE_UNAVAILABLE'),
     });
   }
 };
@@ -678,12 +662,10 @@ export const reviewFlashcard = async (req: AuthenticatedRequest, res: Response):
       },
     });
   } catch (err: any) {
+    console.error('[AIController] Error in reviewFlashcard:', err);
     res.status(500).json({
       success: false,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: err.message || 'Internal server error processing flashcard review',
-      },
+      error: formatSanitizedError(err, 'Internal server error processing flashcard review', 'INTERNAL_ERROR'),
     });
   }
 };

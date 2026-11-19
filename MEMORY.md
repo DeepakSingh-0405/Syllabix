@@ -62,9 +62,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 07:** Fix Flashcard Permissions (COMPLETED - flashcard review ownership enforcement)
 - [x] **Task 08:** Prevent Reputation Manipulation (COMPLETED - author validation, once-only acceptance, anti-reputation farming)
 - [x] **Task 09:** Sanitize Search Expressions (COMPLETED - escape regex special characters across search and lookup endpoints)
-- [ ] **Task 10:** Sanitize Server Error Responses (`server/src/server.ts` - suppress stack trace leaks in production)
-- [ ] **Tasks 04–10:** Security & Authorization Hardening
-- [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
+- [x] **Task 10:** Sanitize Server Error Responses (COMPLETED - suppress stack trace and internal message leaks in production)
+- [x] **Phase 2 (Tasks 04–10):** Security & Authorization Hardening (COMPLETED)
+- [ ] **Task 11:** Implement Discussion Answer Loading (`client/src/pages/DiscussionsPage.tsx` - fetch and render thread comments)
+- [ ] **Task 12:** Add Accept Answer UI Action (`client/src/pages/DiscussionsPage.tsx` - author action to mark solution)
+- [ ] **Task 13:** Add Discussion Resolution Indicator (`client/src/pages/DiscussionsPage.tsx` - resolved badges and accepted styling)
 - [ ] **Tasks 14–15:** Real-Time Study Room Chat & Presence
 - [ ] **Tasks 16–17:** Document Upload & Ingestion Pipeline
 - [ ] **Tasks 18–20:** Analytics Dashboard & Leaderboard Rankings
@@ -77,13 +79,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. `server/src/services/documentParser.ts`: Incompatible `pdf-parse` v2 module syntax causing potential parser errors on binary PDF buffers.
-2. `server/src/controllers/gamificationController.ts` & `analyticsController.ts`: Returns data payloads without uniform `{ success: true, data: ... }` envelope, breaking client hooks expecting uniform contracts.
-3. Client `api.ts` only reads Supabase auth token, omitting demo tokens stored in localStorage.
-4. Search endpoints in `aiController.ts` and `resourceController.ts` execute unsanitized string inputs in RegExp constructors.
+1. Discussions UI in `client/src/pages/DiscussionsPage.tsx` displays discussion threads without loading nested comment replies from `/api/v1/discussions/:id/comments`.
+2. Supabase Realtime channels in study rooms need end-to-end presence and message sync hooks.
+3. Search endpoints and upload flows need progress indicators and optimistic state transitions.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 09: Sanitize Search Expressions.
-- **Immediate Next Task:** Task 10: Sanitize Server Error Responses (`server/src/server.ts` - suppress stack trace leaks in production).
+- **Current Task:** Completed Task 10: Sanitize Server Error Responses.
+- **Immediate Next Task:** Task 11: Implement Discussion Answer Loading (`client/src/pages/DiscussionsPage.tsx`).
