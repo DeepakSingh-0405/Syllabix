@@ -126,7 +126,7 @@ export interface GeneratedFlashcard {
 
 export class GeminiService {
   private getApiKey(): string {
-    return env.GEMINI_API_KEY || '';
+    return process.env.GEMINI_API_KEY !== undefined ? process.env.GEMINI_API_KEY : (env.GEMINI_API_KEY || '');
   }
 
   /**
@@ -352,8 +352,8 @@ ${studentQuery}`;
    */
   async generateSummary(
     subjectName: string,
-    subjectCode: string,
-    contextText: string,
+    subjectCode: string = '',
+    contextText: string = '',
     topics?: string[]
   ): Promise<GeneratedSummary> {
     const effectiveContext = contextText && contextText.trim().length > 50
@@ -420,8 +420,8 @@ Output strictly valid JSON.`;
    */
   async generateQuiz(
     subjectName: string,
-    subjectCode: string,
-    contextText: string,
+    subjectCode: string = '',
+    contextText: string = '',
     difficulty: string = 'medium',
     count: number = 4
   ): Promise<GeneratedQuiz> {
@@ -492,8 +492,8 @@ Output strictly valid JSON with the following structure:
    */
   async generateFlashcards(
     subjectName: string,
-    subjectCode: string,
-    contextText: string,
+    subjectCode: string = '',
+    contextText: string = '',
     count: number = 6
   ): Promise<GeneratedFlashcard[]> {
     const effectiveContext = contextText && contextText.trim().length > 50
@@ -1315,20 +1315,51 @@ ${u.highYieldConcepts.map((h) => `- ${h}`).join('\n')}
       if (cards.length >= count) break;
     }
 
-    // Fallback if contextText was short
-    if (cards.length < count) {
-      cards.push(
-        {
-          front: `Explain the fundamental goal and scope of ${subjectName} (${subjectCode}).`,
-          back: `To establish mathematical foundations, structural invariants, and optimal algorithms/architectures for solving complex engineering problems.`,
-          sourceRef: `${subjectCode} — Unit 1: Foundations`,
-        },
-        {
-          front: `How are edge cases and boundary conditions rigorously handled in ${subjectName}?`,
-          back: `By validating base conditions (e.g. empty inputs, zero thresholds, null pointers) before executing core inductive or iterative state transitions.`,
-          sourceRef: `${subjectCode} — Unit 2: Operational Bounds`,
-        }
-      );
+    // Fallback if contextText was short or yielded fewer than requested count
+    const academicFlashcardTemplates = [
+      {
+        front: (s: string, c: string) => `Explain the fundamental goal and scope of ${s} (${c}).`,
+        back: (s: string) => `To establish mathematical foundations, structural invariants, and optimal algorithms/architectures for solving complex engineering problems in ${s}.`,
+        sourceRef: (c: string) => `${c} — Unit 1: Foundations`,
+      },
+      {
+        front: (s: string, c: string) => `How are edge cases and boundary conditions rigorously handled in ${s}?`,
+        back: (s: string) => `By validating base conditions (e.g. empty inputs, zero thresholds, null pointers) before executing core inductive or iterative state transitions.`,
+        sourceRef: (c: string) => `${c} — Unit 2: Operational Bounds`,
+      },
+      {
+        front: (s: string, c: string) => `What governing correctness invariant must be maintained during state transitions in ${s}?`,
+        back: (s: string) => `Preconditions must be verified upon entry, structural integrity preserved during execution, and postconditions asserted prior to state commitment.`,
+        sourceRef: (c: string) => `${c} — Unit 3: Invariant Verification`,
+      },
+      {
+        front: (s: string, c: string) => `How is asymptotic time and space complexity analyzed for operations in ${s}?`,
+        back: (s: string) => `By formulating recurrence relations for recursive paths, deriving summation bounds for iterative loops, and accounting for auxiliary stack/heap allocations.`,
+        sourceRef: (c: string) => `${c} — Unit 4: Complexity Analysis`,
+      },
+      {
+        front: (s: string, c: string) => `What are common failure modes and architectural traps to avoid in ${s}?`,
+        back: (s: string) => `Resource leaks, unchecked concurrent race conditions, unbounded recursion leading to stack exhaustion, and improper validation of external boundary inputs.`,
+        sourceRef: (c: string) => `${c} — Unit 5: System Robustness`,
+      },
+      {
+        front: (s: string, c: string) => `How should semester examination questions involving derivations in ${s} be structured?`,
+        back: (s: string) => `State formal definitions and boundary assumptions first, present annotated step-by-step mathematical/algorithmic derivations, and conclude with complexity and proof of correctness.`,
+        sourceRef: (c: string) => `${c} — Examination Strategy`,
+      },
+    ];
+
+    let tIdx = 0;
+    while (cards.length < count) {
+      const tmpl = academicFlashcardTemplates[tIdx % academicFlashcardTemplates.length];
+      const safeCode = subjectCode || 'ACAD';
+      const safeSubject = subjectName || 'Curriculum Course';
+      cards.push({
+        front: tmpl.front(safeSubject, safeCode),
+        back: tmpl.back(safeSubject),
+        sourceRef: tmpl.sourceRef(safeCode),
+      });
+      tIdx++;
     }
 
     return cards.slice(0, count);

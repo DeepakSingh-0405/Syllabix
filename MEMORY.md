@@ -86,7 +86,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 25:** Enforce Model Configuration (COMPLETED - canonical gemini-1.5-flash & text-embedding-004 models, zero non-existent model strings)
 - [x] **Task 26:** Normalize Gemini API Error Handling (COMPLETED - GeminiApiError & parseGeminiError handling 429, 403, 503, timeouts with seamless fallback)
 - [x] **Task 27:** Handle Empty Document Extraction Gracefully (COMPLETED - isEmpty flag, preserved short texts, descriptive ingestion fallback chunks)
-- [ ] **Task 28:** Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`)
+- [x] **Task 28:** Ensure Deterministic AI Synthesis Fallback (COMPLETED - guaranteed complete, structured responses for Chatbot, Summary, Quiz, and Flashcards in offline/fallback mode with exact count guarantees across all subjects)
 - [ ] **Task 29:** Optimize Context Window & Chunk Selection (`server/src/services/geminiService.ts`)
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory
@@ -95,11 +95,10 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Deterministic curriculum synthesis fallback needs verified grounding across all 4 student learning modalities.
-2. Context window chunk selection needs budget enforcement and deduplication.
+1. Context window chunk selection needs budget enforcement, token clamping, and deduplication.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 27: Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`).
-- **Immediate Next Task:** Task 28: Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`).
+- **Current Task:** Completed Task 28: Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`).
+- **Immediate Next Task:** Task 29: Optimize Context Window and Chunk Selection (`server/src/services/geminiService.ts`, `server/src/controllers/aiController.ts`).
