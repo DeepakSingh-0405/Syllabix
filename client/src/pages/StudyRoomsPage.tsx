@@ -49,6 +49,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [showPeerList, setShowPeerList] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Realtime broadcast listener for incoming messages from peer students
@@ -70,7 +71,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
   }, []);
 
   // Realtime channel for live study hub chat and peer presence
-  const { onlineUsers, connectionState, broadcastEvent } = useRealtimeChannel(
+  const { onlineUsers, activePeers, presenceNotices, connectionState, broadcastEvent } = useRealtimeChannel(
     activeRoomId ? `study-hub-${activeRoomId}` : '',
     handleIncomingBroadcast
   );
@@ -279,11 +280,52 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-space-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-default bg-surface-muted text-[12px] text-text-tertiary">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{Math.max(onlineUsers.length, 3)} active peers online</span>
-          </div>
+        <div className="flex items-center gap-space-2 relative">
+          <button
+            type="button"
+            onClick={() => setShowPeerList((prev) => !prev)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-default bg-surface-muted text-[12px] text-text-tertiary hover:text-text-secondary hover:border-border-interactive transition-colors cursor-pointer"
+            title="Click to view online scholars in this room"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{Math.max(activePeers.length, onlineUsers.length, 1)} active peers online</span>
+          </button>
+
+          {showPeerList && (
+            <div className="absolute right-0 top-9 z-30 w-72 bg-surface-base border border-border-interactive rounded-lg shadow-md p-3 space-y-2">
+              <div className="flex items-center justify-between pb-1 border-b border-border-default">
+                <span className="text-[12px] font-semibold text-text-secondary">
+                  Active scholars ({Math.max(activePeers.length, 1)})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPeerList(false)}
+                  className="text-[11px] text-text-tertiary hover:text-text-secondary px-1"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                {activePeers.length > 0 ? (
+                  activePeers.map((peer, idx) => (
+                    <div key={peer.userId || idx} className="flex items-center justify-between text-[12px] py-0.5">
+                      <div className="flex items-center gap-1.5 truncate max-w-[150px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span className="text-text-secondary truncate">{peer.name}</span>
+                      </div>
+                      <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-interactive rounded border border-border-default">
+                        {peer.role || 'student'}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-[12px] text-text-tertiary py-1">
+                    {profile?.name || 'You'} (Active in study room)
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <button
             type="button"
@@ -332,8 +374,9 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                         {room.subjectId?.code || 'CS-COURSE'}
                       </span>
                       <span className="text-[11px] text-text-tertiary flex items-center gap-1">
+                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
                         <Users className="w-3 h-3" />
-                        <span>{room.memberIds?.length || 4} members</span>
+                        <span>{isSelected ? Math.max(activePeers.length, 1) : (room.memberIds?.length || 4)} members</span>
                       </span>
                     </div>
 
@@ -435,6 +478,20 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                     </div>
                   );
                 })}
+                {presenceNotices.map((notice) => (
+                  <div
+                    key={notice.id}
+                    className="flex items-center justify-center my-1"
+                  >
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-tertiary bg-surface-interactive/60 border border-border-default/40 px-2.5 py-0.5 rounded-full">
+                      <span className={`w-1.5 h-1.5 rounded-full ${notice.type === 'join' ? 'bg-emerald-400' : 'bg-text-disabled'}`} />
+                      <span>
+                        {notice.name} {notice.type === 'join' ? 'joined the study circle' : 'left the study circle'}
+                      </span>
+                      <span className="text-[10px] text-text-disabled">({notice.timestamp})</span>
+                    </span>
+                  </div>
+                ))}
                 <div ref={messagesEndRef} />
               </div>
 

@@ -5,11 +5,28 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 
 export type RealtimeConnectionState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'error';
 
-interface PresenceState {
+export interface PresenceUser {
+  userId: string;
+  name: string;
+  role?: string;
+  onlineAt: string;
+}
+
+export interface PresenceEventNotice {
+  id: string;
+  type: 'join' | 'leave';
+  name: string;
+  timestamp: string;
+}
+
+interface RawPresenceState {
   [key: string]: {
-    user_id: string;
+    user_id?: string;
+    userId?: string;
     name: string;
-    online_at: string;
+    role?: string;
+    online_at?: string;
+    onlineAt?: string;
   }[];
 }
 
@@ -19,6 +36,8 @@ export function useRealtimeChannel(
 ) {
   const { session, profile } = useAuth();
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [activePeers, setActivePeers] = useState<PresenceUser[]>([]);
+  const [presenceNotices, setPresenceNotices] = useState<PresenceEventNotice[]>([]);
   const [connectionState, setConnectionState] = useState<RealtimeConnectionState>('connecting');
 
   const onBroadcastRef = useRef(onBroadcast);
@@ -31,10 +50,14 @@ export function useRealtimeChannel(
   useEffect(() => {
     if (!channelName) {
       setConnectionState('disconnected');
+      setOnlineUsers([]);
+      setActivePeers([]);
+      setPresenceNotices([]);
       return;
     }
 
     setConnectionState('connecting');
+    setPresenceNotices([]);
 
     const channel = supabase.channel(channelName, {
       config: {
@@ -61,32 +84,78 @@ export function useRealtimeChannel(
       window.addEventListener('syllabix:realtime', handleLocalBroadcast);
     }
 
-    // Presence tracking
+    // Presence tracking: sync, join, and leave
     channel
       .on('presence', { event: 'sync' }, () => {
-        const state: PresenceState = channel.presenceState();
+        const state: RawPresenceState = channel.presenceState();
+        const users: PresenceUser[] = [];
         const names: string[] = [];
+
         Object.values(state).forEach((presences) => {
           presences.forEach((p) => {
-            if (p.name) names.push(p.name);
+            if (p.name) {
+              names.push(p.name);
+              users.push({
+                userId: p.user_id || p.userId || 'guest',
+                name: p.name,
+                role: p.role || 'student',
+                onlineAt: p.online_at || p.onlineAt || new Date().toISOString(),
+              });
+            }
           });
         });
+
         setOnlineUsers(names);
+        setActivePeers(users);
+      })
+      .on('presence', { event: 'join' }, ({ newPresences }: any) => {
+        if (Array.isArray(newPresences)) {
+          newPresences.forEach((p: any) => {
+            if (p.name && p.user_id !== (session?.user?.id || profile?._id)) {
+              setPresenceNotices((prev) => [
+                ...prev.slice(-4),
+                {
+                  id: `join-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                  type: 'join',
+                  name: p.name,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                },
+              ]);
+            }
+          });
+        }
+      })
+      .on('presence', { event: 'leave' }, ({ leftPresences }: any) => {
+        if (Array.isArray(leftPresences)) {
+          leftPresences.forEach((p: any) => {
+            if (p.name && p.user_id !== (session?.user?.id || profile?._id)) {
+              setPresenceNotices((prev) => [
+                ...prev.slice(-4),
+                {
+                  id: `leave-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                  type: 'leave',
+                  name: p.name,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                },
+              ]);
+            }
+          });
+        }
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           setConnectionState('connected');
           try {
             await channel.track({
-              user_id: session?.user?.id || 'guest',
+              user_id: profile?._id || session?.user?.id || 'guest',
               name: profile?.name || session?.user?.email?.split('@')[0] || 'Guest Student',
+              role: profile?.role || 'student',
               online_at: new Date().toISOString(),
             });
           } catch {
             // Presence tracking error fallback
           }
         } else if (status === 'TIMED_OUT' || status === 'CLOSED') {
-          // If remote Supabase is unconfigured, fallback gracefully to connected local channel
           if (!isSupabaseConfigured) {
             setConnectionState('connected');
           } else {
@@ -109,7 +178,7 @@ export function useRealtimeChannel(
       supabase.removeChannel(channel);
       activeChannelRef.current = null;
     };
-  }, [channelName, session?.user?.id, profile?.name]);
+  }, [channelName, session?.user?.id, profile?._id, profile?.name, profile?.role]);
 
   const broadcastEvent = useCallback(
     async (event: string, payload: any) => {
@@ -138,5 +207,5 @@ export function useRealtimeChannel(
     [channelName]
   );
 
-  return { onlineUsers, connectionState, broadcastEvent };
+  return { onlineUsers, activePeers, presenceNotices, connectionState, broadcastEvent };
 }

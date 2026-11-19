@@ -69,8 +69,10 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 13:** Add Discussion Resolution Indicator (COMPLETED - status filter tabs, card badges, verified solution banner, highlighted accepted cards)
 - [x] **Phase 3 (Tasks 11–13):** Complete Community Features (COMPLETED)
 - [x] **Task 14:** Implement Supabase Realtime Chat (COMPLETED - real-time message broadcast, deduplication, connection state indicators, channel cleanup)
-- [ ] **Task 15:** Add Peer Presence Indicators (`client/src/pages/StudyRoomsPage.tsx` - live presence tracking)
-- [ ] **Tasks 16–17:** Document Upload & Ingestion Pipeline
+- [x] **Task 15:** Add Peer Presence Indicators (COMPLETED - presence sync/join/leave events, active scholar roster popover, inline join/leave notices)
+- [x] **Phase 4 (Tasks 14–15):** Real-Time Study Rooms (COMPLETED)
+- [ ] **Task 16:** Improve Upload Flow Reliability (`client/src/components/UploadModal.tsx` - error states, progress feedback)
+- [ ] **Task 17:** Validate Storage Direct PUT (`client/src/components/UploadModal.tsx` - safe URL validation, timeout/CORS error handling)
 - [ ] **Tasks 18–20:** Analytics Dashboard & Leaderboard Rankings
 - [ ] **Tasks 21–24:** Database & Backend Reliability
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
@@ -88,5 +90,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 14: Implement Supabase Realtime Chat.
-- **Immediate Next Task:** Task 15: Add Peer Presence Indicators (`client/src/pages/StudyRoomsPage.tsx`).
+- **Current Task:** Completed Task 15: Add Peer Presence Indicators (Phase 4 Completed).
+- **Immediate Next Task:** Task 16: Improve Upload Flow Reliability (`client/src/components/UploadModal.tsx`).
