@@ -53,7 +53,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 
 ## F. Current Progress
 - [x] **Phase 0:** Initial Project Safety Check & Documentation Milestone (COMPLETED)
-- [ ] **Task 01:** Fix PDF Document Parsing
+- [x] **Task 01:** Fix PDF Document Parsing (COMPLETED - integrated pdf-parse v2 PDFParse class)
 - [ ] **Task 02:** Normalize API Response Contract (Leaderboard & Analytics)
 - [ ] **Task 03:** Fix Demo Authentication Session Handling
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
@@ -78,5 +78,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Commit and push Phase 0 documentation milestone.
-- **Immediate Next Task:** Task 01: Fix PDF Document Parsing in `server/src/services/documentParser.ts`.
+- **Current Task:** Completed Task 01: Fix PDF Document Parsing.
+- **Immediate Next Task:** Task 02: Normalize API Response Contract (Leaderboard & Analytics) in `server/src/controllers/gamificationController.ts`, `server/src/controllers/analyticsController.ts`, and `client/src/lib/api.ts`.

@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pdfParseModule = require('pdf-parse');
-const pdfParse = typeof pdfParseModule === 'function' ? pdfParseModule : (pdfParseModule?.default || pdfParseModule);
+import { PDFParse } from 'pdf-parse';
 
 export interface ParsedChunk {
   chunkIndex: number;
@@ -28,17 +26,33 @@ export async function parseDocumentBuffer(
   const chunkSize = options.chunkSizeChars || 1800; // ~450 tokens
   const overlap = options.overlapChars || 180;      // ~10% overlap
 
+  if (!buffer || buffer.length === 0) {
+    return {
+      title: 'Empty Document',
+      totalPages: 1,
+      totalTextLength: 0,
+      chunks: [],
+    };
+  }
+
   let rawText = '';
   let totalPages = 1;
 
   if (mimeType === 'application/pdf') {
+    let parser: InstanceType<typeof PDFParse> | null = null;
     try {
-      const pdfData = await pdfParse(buffer);
+      parser = new PDFParse({ data: new Uint8Array(buffer) });
+      const pdfData = await parser.getText();
       rawText = pdfData.text || '';
-      totalPages = pdfData.numpages || 1;
+      totalPages = Math.max(pdfData.total || 1, 1);
     } catch (err) {
-      console.warn('[DocumentParser] PDF parsing failed, extracting as UTF-8 string:', err);
-      rawText = buffer.toString('utf-8');
+      console.warn('[DocumentParser] PDF parsing failed, falling back to safe text extraction:', err);
+      // Strip binary non-printable characters so we don't pollute search chunks with raw binary
+      rawText = buffer.toString('utf-8').replace(/[^\x20-\x7E\t\n\r]/g, ' ');
+    } finally {
+      if (parser) {
+        await parser.destroy().catch(() => {});
+      }
     }
   } else {
     rawText = buffer.toString('utf-8');

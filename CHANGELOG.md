@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [Unreleased]
+### Fixed
+- Fixed PDF document parsing in `server/src/services/documentParser.ts` by updating to `pdf-parse` v2 constructor and API, enabling multi-page extraction and graceful error handling.
+
 ### Added
 - Comprehensive project documentation suite (`README.md`, `MEMORY.md`, `CONTRIBUTING.md`, `SECURITY.md`, and technical specifications in `docs/`).
 - GitHub CI actions workflow (`.github/workflows/ci.yml`) and issue/PR templates.
