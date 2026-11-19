@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI-Powered Academic Knowledge & Collaboration Platform (MERN + Supabase)",
   "scripts": {
-    "test": "node server/node_modules/tsx/dist/cli.mjs tests/e2e-ai-verification.ts",
+    "test": "node server/node_modules/tsx/dist/cli.mjs tests/fullWorkflowE2E.test.ts && node server/node_modules/tsx/dist/cli.mjs tests/e2e-ai-verification.ts",
     "build:server": "cd server && npm run build",
     "build:client": "cd client && npm run build",
     "build": "npm run build:server && npm run build:client",

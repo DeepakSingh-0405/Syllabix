@@ -138,5 +138,6 @@ export async function parseDocumentBuffer(
     totalPages,
     totalTextLength: cleanText.length,
     chunks,
+    isEmpty: false,
   };
 }

@@ -25,6 +25,34 @@ export interface UploadFormState {
   manualSubjectCode: string;
 }
 
+export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+export const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.pptx', '.txt'];
+export const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+];
+
+export function validateFileSelection(file: { name: string; size: number; type: string }): { valid: boolean; error?: string } {
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return {
+      valid: false,
+      error: `File size exceeds the 25 MB limit.`,
+    };
+  }
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+  const hasValidExt = ALLOWED_EXTENSIONS.includes(extension);
+  const hasValidMime = file.type ? ALLOWED_MIME_TYPES.includes(file.type) : false;
+  if (!hasValidExt && !hasValidMime) {
+    return {
+      valid: false,
+      error: `Unsupported format`,
+    };
+  }
+  return { valid: true };
+}
+
 export function computeInitialUploadState(
   subjects: SubjectItem[],
   initialSubject?: SubjectItem | null
