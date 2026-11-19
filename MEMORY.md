@@ -71,7 +71,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 14:** Implement Supabase Realtime Chat (COMPLETED - real-time message broadcast, deduplication, connection state indicators, channel cleanup)
 - [x] **Task 15:** Add Peer Presence Indicators (COMPLETED - presence sync/join/leave events, active scholar roster popover, inline join/leave notices)
 - [x] **Phase 4 (Tasks 14–15):** Real-Time Study Rooms (COMPLETED)
-- [ ] **Task 16:** Improve Upload Flow Reliability (`client/src/components/UploadModal.tsx` - error states, progress feedback)
+- [x] **Task 16:** Improve Upload Flow Reliability (COMPLETED - file validation, progressive status, error recovery, retry capability)
 - [ ] **Task 17:** Validate Storage Direct PUT (`client/src/components/UploadModal.tsx` - safe URL validation, timeout/CORS error handling)
 - [ ] **Tasks 18–20:** Analytics Dashboard & Leaderboard Rankings
 - [ ] **Tasks 21–24:** Database & Backend Reliability
@@ -90,5 +90,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 15: Add Peer Presence Indicators (Phase 4 Completed).
-- **Immediate Next Task:** Task 16: Improve Upload Flow Reliability (`client/src/components/UploadModal.tsx`).
+- **Current Task:** Completed Task 16: Improve Upload Flow Reliability.
+- **Immediate Next Task:** Task 17: Validate Storage Direct PUT (`client/src/components/UploadModal.tsx`).

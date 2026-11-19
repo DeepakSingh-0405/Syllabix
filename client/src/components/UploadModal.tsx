@@ -1,7 +1,38 @@
 import React, { useState } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
-import { UploadCloud, X, CheckCircle2, AlertCircle, Edit3, ListFilter } from 'lucide-react';
+import { UploadCloud, X, CheckCircle2, AlertCircle, Edit3, ListFilter, Loader2, RotateCcw } from 'lucide-react';
+
+export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+export const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.pptx', '.txt'];
+export const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+];
+
+export function validateFileSelection(file: { name: string; size: number; type: string }): { valid: boolean; error?: string } {
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return {
+      valid: false,
+      error: `File size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the 25 MB limit. Please select a smaller document.`,
+    };
+  }
+
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+  const hasValidExt = ALLOWED_EXTENSIONS.includes(extension);
+  const hasValidMime = file.type ? ALLOWED_MIME_TYPES.includes(file.type) : false;
+
+  if (!hasValidExt && !hasValidMime) {
+    return {
+      valid: false,
+      error: `Unsupported file format "${extension}". Only PDF, DOCX, PPTX, and TXT documents are supported.`,
+    };
+  }
+
+  return { valid: true };
+}
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -28,19 +59,29 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selected = e.target.files[0];
+      const validation = validateFileSelection(selected);
+      if (!validation.valid) {
+        setError(validation.error || 'Invalid file selection.');
+        setFile(null);
+        e.target.value = '';
+        return;
+      }
+      setFile(selected);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!title.trim()) {
       setError('Document title is required.');
       return;
@@ -53,6 +94,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
     setUploading(true);
     setError(null);
+    setUploadProgress(15);
     setStatusMessage('Preparing syllabus registration and upload URL...');
 
     try {
@@ -77,15 +119,19 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         fileSizeBytes: file?.size || 1024,
       });
 
+      setUploadProgress(45);
+
       // 2. Direct upload to Supabase Storage if file was provided and signed upload URL is valid
       if (file && intent?.uploadUrl && intent.uploadUrl.startsWith('http')) {
         setStatusMessage('Saving document to storage catalog...');
+        setUploadProgress(65);
         try {
           await fetch(intent.uploadUrl, {
             method: 'PUT',
             headers: { 'Content-Type': mimeType },
             body: file,
           });
+          setUploadProgress(85);
         } catch (storageErr) {
           console.warn('[UploadModal] Supabase direct PUT fallback notice:', storageErr);
         }
@@ -101,13 +147,17 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         }
       }
 
+      setUploadProgress(100);
       setStatusMessage('Upload complete! Document added to curriculum catalog.');
       setTimeout(() => {
         onUploadSuccess();
         onClose();
       }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Failed to submit syllabus document.');
+      console.error('[UploadModal] Upload failure:', err);
+      setError(err.message || 'Failed to submit syllabus document. Please check your connection and retry.');
+      setUploadProgress(0);
+      setStatusMessage(null);
     } finally {
       setUploading(false);
     }
@@ -142,15 +192,44 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         </div>
 
         {error && (
-          <div className="mb-4 p-space-3 bg-status-errorSurface border border-status-error rounded-md text-status-error text-[13px] flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="mb-4 p-space-3 bg-status-errorSurface border border-status-error rounded-md text-status-error text-[13px] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleSubmit()}
+              disabled={uploading}
+              className="px-2.5 py-1 rounded bg-surface-base border border-status-error text-[11px] font-medium hover:bg-surface-interactive transition-colors shrink-0 flex items-center gap-1"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Retry</span>
+            </button>
           </div>
         )}
 
-        {statusMessage && (
+        {uploading && (
+          <div className="mb-4 p-space-3 bg-surface-base border border-border-interactive rounded-md space-y-2">
+            <div className="flex items-center justify-between text-[12px] text-text-secondary">
+              <span className="flex items-center gap-1.5 font-medium">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-green" />
+                <span>{statusMessage || 'Processing syllabus document...'}</span>
+              </span>
+              <span className="font-mono text-accent-green">{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-surface-muted h-1.5 rounded-full overflow-hidden border border-border-default">
+              <div
+                className="bg-accent-green h-full transition-all duration-300 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {!uploading && statusMessage && (
           <div className="mb-4 p-space-3 bg-surface-base border border-border-interactive rounded-md text-text-secondary text-[13px] flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-text-secondary shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-accent-green shrink-0" />
             <span>{statusMessage}</span>
           </div>
         )}
