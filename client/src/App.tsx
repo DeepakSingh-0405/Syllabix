@@ -83,7 +83,12 @@ const AppContent: React.FC = () => {
 
     const start = () => {
       if (motionPreference.matches || lenis) return;
-      lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+      lenis = new Lenis({
+        duration: 1.1,
+        smoothWheel: true,
+        anchors: true,
+        allowNestedScroll: true,
+      });
       frameId = requestAnimationFrame(animateScroll);
     };
 

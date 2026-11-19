@@ -6,6 +6,7 @@
 
 @layer base {
   html {
+    --app-navbar-height: 68px;
     scroll-padding-top: 80px;
     background-color: var(--color-surface-base);
     color-scheme: dark;
@@ -112,6 +113,10 @@
       border-bottom: 1px solid var(--color-border-default);
       background: rgba(8, 11, 20, 0.82);
       backdrop-filter: blur(20px);
+    }
+
+    .details-drawer-backdrop {
+      top: var(--app-navbar-height);
     }
 
     .app-navbar-inner {
@@ -757,6 +762,10 @@
     }
 
     @media (max-width: 640px) {
+      :root {
+        --app-navbar-height: 62px;
+      }
+
       .app-navbar-inner {
         height: 62px;
         padding: 0 14px;

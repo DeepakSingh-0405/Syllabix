@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Subject } from '../types';
 import { api } from '../lib/api';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { X, Sparkles, Layers, RotateCw, CheckCircle2, AlertCircle, HelpCircle, Check, RefreshCw } from 'lucide-react';
 
 interface DetailsDrawerProps {
@@ -55,6 +56,8 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
   const [loadingAction, setLoadingAction] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [quizError, setQuizError] = useState<string | null>(null);
+
+  useBodyScrollLock(Boolean(subject));
 
   if (!subject) return null;
 
@@ -130,9 +133,13 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="drawer-subject-title"
-      className="fixed inset-0 z-50 flex items-center justify-end bg-surface-base/80 backdrop-blur-sm"
+      data-lenis-prevent
+      className="details-drawer-backdrop fixed right-0 bottom-0 left-0 z-40 flex items-center justify-end bg-surface-base/80 backdrop-blur-sm"
     >
-      <div className="relative w-full max-w-xl h-full bg-surface-muted border-l border-border-default shadow-md p-space-4 sm:p-6 flex flex-col overflow-y-auto">
+      <div
+        data-lenis-prevent
+        className="relative h-full min-h-0 w-full max-w-xl overscroll-contain border-l border-border-default bg-surface-muted p-space-4 shadow-md sm:p-6 flex flex-col overflow-y-auto"
+      >
         {/* Header */}
         <div className="flex items-start justify-between pb-space-3 border-b border-border-default mb-space-3">
           <div>
