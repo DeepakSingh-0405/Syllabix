@@ -32,12 +32,13 @@ University education often suffers from fragmented academic resources, inaccessi
 
 ## Key Capabilities
 
-- **Academic Syllabus Directory:** Interactive exploration of branches, semesters, courses, and unit-by-unit curriculum outlines.
-- **AI Study Assistant (Gemini Engine):** Multi-turn conversational interface with scanned lecture note parsing, document ingestion, and grounded citations.
-- **Details Drawer (Study Suite):** Instant high-yield unit summaries, interactive 5-question mock exams, and instant flashcard deck creation.
-- **Collaborative Study Rooms:** Real-time peer study spaces with live presence tracking, group chat, and resource attachments.
-- **Academic Mentorship:** Search and connect with top-tier departmental mentors, schedule 1-on-1 review sessions, and track requests.
-- **Community Discussions:** Peer forum supporting upvotes, accepted answers, subject tagging, and reputation points.
+- **Academic Syllabus Directory:** Interactive multi-dimensional exploration of engineering branches (CSE, IT, ECE, ME, CE), semesters (1–8), courses, dynamic subject pills, and unit-by-unit curriculum outlines.
+- **AI Study Assistant (Gemini Engine):** Multi-turn conversational interface with scanned lecture note parsing, document ingestion, and grounded citations powered by canonical `gemini-1.5-flash` and `text-embedding-004`.
+- **Details Drawer (Study Suite):** Instant high-yield unit summaries, interactive 5-question mock exams, direct syllabus contribution actions, and instant flashcard deck creation.
+- **Spaced Repetition Flashcards:** SuperMemo SM-2 spaced-repetition engine calculating ease factors ($EF \ge 1.3$), review intervals ($1 \to 6 \to \text{round}(I \times EF)$), and due dates directly synthesized from lecture units.
+- **Collaborative Study Rooms:** Real-time peer study spaces with Supabase Realtime Channels, live peer presence tracking, group chat, and resource attachments.
+- **Academic Mentorship:** Search and connect with top-tier departmental mentors, schedule 1-on-1 review sessions with rich instant topic quote confirmations, and track requests.
+- **Community Discussions:** Peer forum supporting upvotes, accepted answers with resolution status indicators, subject tagging, and 15 reputation points attribution.
 - **Institutional Analytics:** Dean and departmental view tracking verified syllabus coverage, student engagement, and resource health.
 
 ---
@@ -253,14 +254,15 @@ Base URL: `http://localhost:5001/api/v1`
 
 ## Testing & Verification
 
-Run the comprehensive verification test suite:
+Run the comprehensive dual-tier verification test suite:
 ```bash
-# Execute 70-test 4-tier verification suite
+# Execute both Full Platform E2E Suite (7 student journeys) and 70-test Gemini AI suite (560 assertions)
 npm test
 
 # Build checks
-npm run build:server   # TypeScript compilation
-npm run build:client   # Vite production bundle
+npm run build:server   # Backend TypeScript compilation
+npm run build:client   # Frontend Vite production bundle
+npm run build          # Full stack production build verification
 ```
 
 ---

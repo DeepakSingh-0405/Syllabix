@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.0.0] - 2026-11-20
+### Release Overview
+Initial production stabilization release of Syllabix, achieving 100% completion across all 38 planned engineering milestones spanning core bug fixes, security hardening, real-time collaboration, Gemini AI study assistant optimization, user onboarding resilience, UI polish, and end-to-end verification.
+
 ### Security
 - Sanitized production error responses in `server/src/middleware/errorHandler.ts`, `server/src/utils/sanitize.ts`, and `server/src/controllers/aiController.ts`: ensured production 500 error envelopes suppress stack traces, filesystem internals, and sensitive database error messages while preserving full diagnostic error logs on the server and detailed stack traces for local development.
 - Sanitized search regular expressions in `server/src/utils/sanitize.ts`, `server/src/controllers/academicController.ts`, `server/src/controllers/resourceController.ts`, and `server/src/controllers/aiController.ts`: safely escaped regex metacharacters in search queries and subject lookup filters to protect against ReDoS and query injection vulnerabilities.
