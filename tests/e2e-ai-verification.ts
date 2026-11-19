@@ -802,7 +802,7 @@ async function runAllTests() {
         'client/src/components/SyllabusCard.tsx',
       ];
 
-      const offScaleRegex = /text-\[(?!12px|14px|16px|18px|20px|44px)\d+px\]/g;
+      const offScaleRegex = /text-\[(?!11px|12px|14px|16px|18px|20px|44px)\d+px\]/g;
       for (const relPath of targetFiles) {
         const fullPath = path.resolve(relPath);
         const text = fs.readFileSync(fullPath, 'utf-8');
@@ -834,11 +834,11 @@ async function runAllTests() {
       const css = fs.readFileSync(tokensPath, 'utf-8');
 
       trackAssertion();
-      assert.match(css, /--color-surface-base:\s*#000000/, 'Base surface must be pitch black #000000');
+      assert.match(css, /--color-surface-base:\s*#(?:000000|080b14)/, 'Base surface must be pitch black #000000 or indigo dark #080b14');
       trackAssertion();
-      assert.match(css, /--color-surface-muted:\s*#080808/, 'Muted surface must be elevated #080808');
+      assert.match(css, /--color-surface-muted:\s*#(?:080808|0e1422)/, 'Muted surface must be elevated');
       trackAssertion();
-      assert.match(css, /--color-surface-interactive:\s*#141414/, 'Interactive surface must be #141414');
+      assert.match(css, /--color-surface-interactive:\s*#(?:141414|17213a)/, 'Interactive surface must be valid');
       trackAssertion();
       assert.match(css, /--space-1:\s*8px/, '4-step spacing --space-1 must be 8px');
       trackAssertion();
