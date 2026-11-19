@@ -256,31 +256,34 @@ export class GeminiService {
     subjectCode?: string,
     conversationHistory?: { role: string; content: string }[]
   ): Promise<GroundedRAGResult> {
+    const safeQuery = (studentQuery || '').slice(0, 8000);
     let contextBlock = '';
     const citedChunks: GroundedRAGResult['citedChunks'] = [];
 
     // 1. High priority: Scanned specific document text uploaded or attached by user
     if (scannedDocumentText && scannedDocumentText.trim()) {
-      contextBlock += `=== USER-ATTACHED SCANNED DOCUMENT: "${scannedDocumentName || 'Attached Document'}" ===\n${scannedDocumentText.slice(0, 10000)}\n\n`;
+      const clampedScan = scannedDocumentText.slice(0, 10000);
+      contextBlock += `=== USER-ATTACHED SCANNED DOCUMENT: "${scannedDocumentName || 'Attached Document'}" ===\n${clampedScan}\n\n`;
       citedChunks.push({
         resourceId: 'scanned-doc-user',
         docTitle: scannedDocumentName || 'User Scanned Document',
         pageNumber: 1,
         sectionTitle: 'Direct Document Scan',
-        excerpt: scannedDocumentText.slice(0, 180).trim() + '...',
+        excerpt: clampedScan.slice(0, 180).trim() + '...',
       });
     }
 
     // 2. Secondary: Curriculum document chunks retrieved from database
     if (contextChunks && contextChunks.length > 0) {
-      contextBlock += contextChunks
+      const clampedChunks = contextChunks.slice(0, 4);
+      contextBlock += clampedChunks
         .map(
           (c, idx) =>
-            `[Course Document ${idx + 1} | "${c.docTitle}", Page ${c.pageNumber}, Section: "${c.sectionTitle || 'General'}"]\n${c.textContent}`
+            `[Course Document ${idx + 1} | "${c.docTitle}", Page ${c.pageNumber}, Section: "${c.sectionTitle || 'General'}"]\n${c.textContent.slice(0, 1500)}`
         )
         .join('\n\n---\n\n');
 
-      contextChunks.forEach((c) => {
+      clampedChunks.forEach((c) => {
         citedChunks.push({
           resourceId: c.resourceId,
           docTitle: c.docTitle,
@@ -291,15 +294,20 @@ export class GeminiService {
       });
     }
 
-    // 3. Multi-turn conversation history block
+    // 3. Multi-turn conversation history block (clamped to last 6 messages, 1500 chars each)
     let historyBlock = '';
     if (conversationHistory && conversationHistory.length > 0) {
       historyBlock = '=== PRIOR CONVERSATION HISTORY ===\n' +
         conversationHistory
           .slice(-6)
-          .map((msg) => `${msg.role === 'user' ? 'Student' : 'Tutor'}: ${msg.content}`)
+          .map((msg) => `${msg.role === 'user' ? 'Student' : 'Tutor'}: ${msg.content.slice(0, 1500)}`)
           .join('\n') +
         '\n\n';
+    }
+
+    // Enforce overall contextBlock budget limit
+    if (contextBlock.length > 16000) {
+      contextBlock = contextBlock.slice(0, 16000);
     }
 
     const courseHeader = subjectName ? `Subject: ${subjectName} (${subjectCode || 'ACAD'})\n` : '';
@@ -315,7 +323,7 @@ GUIDELINES:
 
 ${historyBlock}${contextBlock ? `Academic Context & Course Materials:\n${contextBlock}\n\n` : ''}
 Student Question:
-${studentQuery}`;
+${safeQuery}`;
 
     // Try live Gemini API securely via header
     const apiResult = await this.executeGenerateContent(

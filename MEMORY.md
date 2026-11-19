@@ -87,18 +87,22 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 26:** Normalize Gemini API Error Handling (COMPLETED - GeminiApiError & parseGeminiError handling 429, 403, 503, timeouts with seamless fallback)
 - [x] **Task 27:** Handle Empty Document Extraction Gracefully (COMPLETED - isEmpty flag, preserved short texts, descriptive ingestion fallback chunks)
 - [x] **Task 28:** Ensure Deterministic AI Synthesis Fallback (COMPLETED - guaranteed complete, structured responses for Chatbot, Summary, Quiz, and Flashcards in offline/fallback mode with exact count guarantees across all subjects)
-- [ ] **Task 29:** Optimize Context Window & Chunk Selection (`server/src/services/geminiService.ts`)
-- [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
-- [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory
+- [x] **Task 29:** Optimize Context Window & Chunk Selection (COMPLETED - fingerprint deduplication, multi-document source diversity balancing, per-chunk clamping to 1500 chars, and global context budget enforcement)
+- [x] **Phase 8 (Tasks 25–29):** AI Study Assistant Optimization (COMPLETED)
+- [ ] **Task 30:** Initialize User Profile on First Login (`server/src/controllers/authController.ts`)
+- [ ] **Task 31:** Handle Backend Unavailable in Client API (`client/src/lib/api.ts`)
+- [ ] **Tasks 32–33:** Mentorship Booking Feedback & Notification Badge Counter
+- [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory Filters
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Context window chunk selection needs budget enforcement, token clamping, and deduplication.
+1. User profile synchronization needs seamless first-login creation in MongoDB when users register via Supabase Auth.
+2. Client API needs graceful handling when the backend server is temporarily offline.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 28: Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`).
-- **Immediate Next Task:** Task 29: Optimize Context Window and Chunk Selection (`server/src/services/geminiService.ts`, `server/src/controllers/aiController.ts`).
+- **Current Task:** Completed Task 29: Optimize Context Window and Chunk Selection (`server/src/controllers/aiController.ts`, `server/src/services/geminiService.ts`).
+- **Immediate Next Task:** Task 30: Initialize User Profile on First Login (`server/src/controllers/authController.ts`).

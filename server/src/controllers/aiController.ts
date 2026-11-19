@@ -10,6 +10,103 @@ import { cacheService } from '../services/redisService';
 import { getCurriculumBySubject, getCurriculumContext } from '../data/curriculumData';
 import { escapeRegex, formatSanitizedError } from '../utils/sanitize';
 
+export interface ScoredChunk {
+  resourceId: string;
+  docTitle: string;
+  pageNumber: number;
+  sectionTitle?: string;
+  textContent: string;
+  similarity: number;
+}
+
+/**
+ * Optimizes chunk selection for the LLM / synthesis context window:
+ * - Sorts by cosine similarity descending.
+ * - Deduplicates redundant content (identical text snippets / near duplicates).
+ * - Enforces source diversity (prevents a single resource from dominating if diverse materials exist).
+ * - Clamps per-chunk length to prevent prompt bloat.
+ * - Enforces strict global token/character budget limit across all chunks.
+ */
+export function optimizeChunkSelection(
+  scoredChunks: ScoredChunk[],
+  maxChunks: number = 4,
+  maxTotalChars: number = 6000,
+  maxCharsPerChunk: number = 1500
+): ScoredChunk[] {
+  if (!scoredChunks || scoredChunks.length === 0) return [];
+
+  // Sort by similarity descending
+  const sorted = [...scoredChunks].sort((a, b) => b.similarity - a.similarity);
+
+  const selected: ScoredChunk[] = [];
+  const seenFingerprints = new Set<string>();
+  const resourceCount = new Map<string, number>();
+  const skippedDueToDiversity: ScoredChunk[] = [];
+  let currentTotalChars = 0;
+
+  for (const chunk of sorted) {
+    if (selected.length >= maxChunks) break;
+
+    // Content fingerprint (normalized first 140 chars)
+    const fingerprint = chunk.textContent
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 140);
+
+    if (fingerprint.length > 20 && seenFingerprints.has(fingerprint)) {
+      continue; // Skip redundant duplicate chunk
+    }
+
+    // Source diversity: limit chunks from the same document if we have diverse candidate documents
+    const resId = chunk.resourceId || 'default';
+    const currentResCount = resourceCount.get(resId) || 0;
+    const uniqueResourcesCount = new Set(sorted.map((c) => c.resourceId)).size;
+    if (uniqueResourcesCount > 1 && currentResCount >= 2 && selected.length < maxChunks) {
+      skippedDueToDiversity.push(chunk);
+      continue;
+    }
+
+    const clampedText = chunk.textContent.length > maxCharsPerChunk
+      ? chunk.textContent.slice(0, maxCharsPerChunk).trim() + '...'
+      : chunk.textContent.trim();
+
+    if (currentTotalChars + clampedText.length > maxTotalChars && selected.length > 0) {
+      break;
+    }
+
+    seenFingerprints.add(fingerprint);
+    resourceCount.set(resId, currentResCount + 1);
+    currentTotalChars += clampedText.length;
+
+    selected.push({
+      ...chunk,
+      textContent: clampedText,
+    });
+  }
+
+  // If diversity filter left open slots, backfill from chunks that were skipped purely due to diversity
+  if (selected.length < maxChunks && skippedDueToDiversity.length > 0) {
+    for (const chunk of skippedDueToDiversity) {
+      if (selected.length >= maxChunks) break;
+
+      const clampedText = chunk.textContent.length > maxCharsPerChunk
+        ? chunk.textContent.slice(0, maxCharsPerChunk).trim() + '...'
+        : chunk.textContent.trim();
+
+      if (currentTotalChars + clampedText.length > maxTotalChars && selected.length > 0) break;
+
+      currentTotalChars += clampedText.length;
+      selected.push({
+        ...chunk,
+        textContent: clampedText,
+      });
+    }
+  }
+
+  return selected;
+}
+
 /**
  * Helper to gather rich textual context from uploaded documents, chunks, and curriculum knowledge base.
  * Prioritizes direct scanned text and resource-specific chunks when resourceId is supplied.
@@ -85,10 +182,11 @@ async function gatherSubjectContext(
   const chunks: any[] = [];
   let contextText = '';
   const resourceTitles: string[] = [];
+  const seenChunkIds = new Set<string>();
 
-  // 4. If direct user scanned text is provided, give it highest priority
+  // 4. If direct user scanned text is provided, give it highest priority (capped at 10,000 chars)
   if (scannedDocumentText && scannedDocumentText.trim()) {
-    contextText += `=== USER-UPLOADED SCANNED DOCUMENT ===\n${scannedDocumentText.trim()}\n\n`;
+    contextText += `=== USER-UPLOADED SCANNED DOCUMENT ===\n${scannedDocumentText.trim().slice(0, 10000)}\n\n`;
   }
 
   // 5. Query DocumentChunk: prioritize specific resourceId if provided
@@ -98,25 +196,45 @@ async function gatherSubjectContext(
         .limit(16)
         .lean();
       if (resourceChunks.length > 0) {
-        chunks.push(...resourceChunks);
-        contextText += `=== UPLOADED RESOURCE EXCERPTS ("${targetResource?.title || 'Selected Resource'}") ===\n` +
-          resourceChunks
-            .map((c, i) => `[Unit / Section: ${c.sectionTitle || `Section ${i + 1}`} (Page ${c.pageNumber})]\n${c.textContent}`)
-            .join('\n\n') + '\n\n';
+        const uniqueResourceChunks: any[] = [];
+        for (const c of resourceChunks) {
+          const cId = c._id.toString();
+          if (!seenChunkIds.has(cId)) {
+            seenChunkIds.add(cId);
+            uniqueResourceChunks.push(c);
+            chunks.push(c);
+          }
+        }
+        if (uniqueResourceChunks.length > 0) {
+          contextText += `=== UPLOADED RESOURCE EXCERPTS ("${targetResource?.title || 'Selected Resource'}") ===\n` +
+            uniqueResourceChunks
+              .map((c, i) => `[Unit / Section: ${c.sectionTitle || `Section ${i + 1}`} (Page ${c.pageNumber})]\n${c.textContent.slice(0, 1500)}`)
+              .join('\n\n') + '\n\n';
+        }
       }
     }
 
-    // Also gather general chunks for the subject
+    // Also gather general chunks for the subject with deduplication
     if (chunks.length < 8 && subject._id && mongoose.Types.ObjectId.isValid(subject._id.toString())) {
       const subjectChunks = await DocumentChunk.find({ subjectId: subject._id })
         .limit(12)
         .lean();
       if (subjectChunks.length > 0) {
-        chunks.push(...subjectChunks);
-        contextText += `=== COURSE DOCUMENT CHUNKS ===\n` +
-          subjectChunks
-            .map((c, i) => `[Unit / Section: ${c.sectionTitle || `Section ${i + 1}`}]\n${c.textContent}`)
-            .join('\n\n') + '\n\n';
+        const uniqueSubjectChunks: any[] = [];
+        for (const c of subjectChunks) {
+          const cId = c._id.toString();
+          if (!seenChunkIds.has(cId)) {
+            seenChunkIds.add(cId);
+            uniqueSubjectChunks.push(c);
+            chunks.push(c);
+          }
+        }
+        if (uniqueSubjectChunks.length > 0) {
+          contextText += `=== COURSE DOCUMENT CHUNKS ===\n` +
+            uniqueSubjectChunks
+              .map((c, i) => `[Unit / Section: ${c.sectionTitle || `Section ${i + 1}`}]\n${c.textContent.slice(0, 1500)}`)
+              .join('\n\n') + '\n\n';
+        }
       }
     }
   } catch (err) {
@@ -145,6 +263,10 @@ async function gatherSubjectContext(
 
   if (!contextText.trim()) {
     contextText = `${subject.name} (${subject.code}): ${subject.description || 'Core university coursework.'}`;
+  }
+
+  if (contextText.length > 15000) {
+    contextText = contextText.slice(0, 15000);
   }
 
   return { subject, contextText: contextText.trim(), resourceTitles, chunks };
@@ -241,11 +363,11 @@ export const queryStudyAssistant = async (req: AuthenticatedRequest, res: Respon
       console.warn('[AIController] Error searching candidate chunks:', err);
     }
 
-    // 7. Rank chunks by Cosine Similarity
+    // 7. Rank chunks by Cosine Similarity and optimize context window selection
     let topChunks: any[] = [];
 
     if (candidateChunks.length > 0) {
-      const scoredChunks = candidateChunks.map((chunk) => {
+      const scoredChunks: ScoredChunk[] = candidateChunks.map((chunk) => {
         const similarity = cosineSimilarity(queryEmbedding, chunk.embedding);
         return {
           resourceId: (chunk.resourceId as any)?._id?.toString() || chunk.resourceId.toString(),
@@ -257,20 +379,19 @@ export const queryStudyAssistant = async (req: AuthenticatedRequest, res: Respon
         };
       });
 
-      scoredChunks.sort((a, b) => b.similarity - a.similarity);
-      topChunks = scoredChunks.slice(0, 4);
+      topChunks = optimizeChunkSelection(scoredChunks, 4, 6000, 1500);
     }
 
     // If no vector chunks exist in DB, synthesize chunks from curriculum knowledge base
     if (topChunks.length === 0) {
       const curriculum = getCurriculumBySubject(subject.code, subject.name);
       if (curriculum) {
-        topChunks = curriculum.units.map((unit) => ({
+        topChunks = curriculum.units.slice(0, 4).map((unit) => ({
           resourceId: `${curriculum.code}-unit-${unit.unitNumber}`,
           docTitle: `${curriculum.name} Syllabus`,
           pageNumber: unit.unitNumber,
           sectionTitle: unit.unit,
-          textContent: `${unit.title}: ${unit.topics.join(', ')}. Key definitions: ${unit.definitions.map((d) => `${d.term} - ${d.definition}`).join('; ')}`,
+          textContent: `${unit.title}: ${unit.topics.join(', ')}. Key definitions: ${unit.definitions.map((d) => `${d.term} - ${d.definition}`).join('; ')}`.slice(0, 1500),
           similarity: 1.0,
         }));
       } else {
@@ -280,7 +401,7 @@ export const queryStudyAssistant = async (req: AuthenticatedRequest, res: Respon
             docTitle: `${subject.name} Curriculum`,
             pageNumber: 1,
             sectionTitle: 'Core Syllabus Guidelines',
-            textContent: contextText.slice(0, 500),
+            textContent: contextText.slice(0, 1500),
             similarity: 1.0,
           },
         ];
