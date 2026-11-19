@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
+import { isSupabaseConfigured } from '../lib/supabase';
 import { UploadCloud, X, CheckCircle2, AlertCircle, Edit3, ListFilter, Loader2, RotateCcw } from 'lucide-react';
 
 export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
@@ -11,6 +12,29 @@ export const ALLOWED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'text/plain',
 ];
+
+export function isValidStorageUploadUrl(urlStr?: string): boolean {
+  if (!urlStr || typeof urlStr !== 'string') return false;
+  try {
+    const parsed = new URL(urlStr);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export function isLocalMockStorageUrl(urlStr: string): boolean {
+  try {
+    const parsed = new URL(urlStr);
+    return (
+      parsed.hostname === '127.0.0.1' ||
+      parsed.hostname === 'localhost' ||
+      parsed.pathname.includes('mock')
+    );
+  } catch {
+    return false;
+  }
+}
 
 export function validateFileSelection(file: { name: string; size: number; type: string }): { valid: boolean; error?: string } {
   if (file.size > MAX_FILE_SIZE_BYTES) {
@@ -121,30 +145,72 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
       setUploadProgress(45);
 
-      // 2. Direct upload to Supabase Storage if file was provided and signed upload URL is valid
-      if (file && intent?.uploadUrl && intent.uploadUrl.startsWith('http')) {
+      let storageUploadConfirmed = !file; // If no file, metadata registration only
+
+      // 2. Direct upload to Supabase Storage if file was provided
+      if (file) {
+        if (!isValidStorageUploadUrl(intent?.uploadUrl)) {
+          throw new Error('Invalid or missing storage upload URL. Please try again.');
+        }
+
         setStatusMessage('Saving document to storage catalog...');
         setUploadProgress(65);
+
+        const uploadUrl = intent.uploadUrl;
+        const controller = new AbortController();
+        const timeoutMs = 30000; // 30s timeout
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
         try {
-          await fetch(intent.uploadUrl, {
+          const putRes = await fetch(uploadUrl, {
             method: 'PUT',
             headers: { 'Content-Type': mimeType },
             body: file,
+            signal: controller.signal,
           });
+          clearTimeout(timeoutId);
+
+          if (!putRes.ok) {
+            throw new Error(`Storage server returned error ${putRes.status} (${putRes.statusText})`);
+          }
+          storageUploadConfirmed = true;
           setUploadProgress(85);
-        } catch (storageErr) {
-          console.warn('[UploadModal] Supabase direct PUT fallback notice:', storageErr);
+        } catch (storageErr: any) {
+          clearTimeout(timeoutId);
+          if (storageErr.name === 'AbortError') {
+            throw new Error('Storage upload timed out after 30 seconds. Please check your network and retry.');
+          }
+
+          // Handle CORS or network failure
+          if (
+            storageErr instanceof TypeError ||
+            storageErr.message?.includes('fetch') ||
+            storageErr.message?.includes('NetworkError')
+          ) {
+            console.warn('[UploadModal] Direct PUT network/CORS error:', storageErr);
+            // In local offline development when Supabase is unconfigured, allow local mock progression
+            if (!isSupabaseConfigured && isLocalMockStorageUrl(uploadUrl)) {
+              storageUploadConfirmed = true;
+              setUploadProgress(85);
+            } else {
+              throw new Error('Storage network or CORS error during document transfer. Please retry.');
+            }
+          } else {
+            throw storageErr;
+          }
         }
       }
 
-      // 3. Confirm upload
-      if (intent?.resourceId) {
+      // 3. Confirm upload (only executed after verified storage upload)
+      if (storageUploadConfirmed && intent?.resourceId) {
         setStatusMessage('Registering syllabus document in curriculum catalog...');
         try {
           await api.post(`/resources/${intent.resourceId}/confirm-upload`);
-        } catch {
-          // Proceed with success
+        } catch (confirmErr: any) {
+          console.warn('[UploadModal] Ingestion trigger notice:', confirmErr);
         }
+      } else if (!storageUploadConfirmed) {
+        throw new Error('Upload could not be confirmed because storage transfer did not complete.');
       }
 
       setUploadProgress(100);

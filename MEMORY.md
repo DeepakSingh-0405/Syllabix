@@ -72,8 +72,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 15:** Add Peer Presence Indicators (COMPLETED - presence sync/join/leave events, active scholar roster popover, inline join/leave notices)
 - [x] **Phase 4 (Tasks 14–15):** Real-Time Study Rooms (COMPLETED)
 - [x] **Task 16:** Improve Upload Flow Reliability (COMPLETED - file validation, progressive status, error recovery, retry capability)
-- [ ] **Task 17:** Validate Storage Direct PUT (`client/src/components/UploadModal.tsx` - safe URL validation, timeout/CORS error handling)
-- [ ] **Tasks 18–20:** Analytics Dashboard & Leaderboard Rankings
+- [x] **Task 17:** Validate Storage Direct PUT (COMPLETED - safe URL validation, timeout/CORS error handling, confirmation gating)
+- [x] **Phase 5 (Tasks 16–17):** Document Upload & Ingestion Pipeline (COMPLETED)
+- [ ] **Task 18:** Align Verified Resource Query (`server/src/controllers/analyticsController.ts`)
+- [ ] **Task 19:** Compute Accurate Coverage Metrics (`server/src/controllers/analyticsController.ts`)
+- [ ] **Task 20:** Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`)
 - [ ] **Tasks 21–24:** Database & Backend Reliability
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
@@ -83,12 +86,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Discussions UI in `client/src/pages/DiscussionsPage.tsx` displays discussion threads without loading nested comment replies from `/api/v1/discussions/:id/comments`.
-2. Supabase Realtime channels in study rooms need end-to-end presence and message sync hooks.
-3. Search endpoints and upload flows need progress indicators and optimistic state transitions.
+1. Analytics verified resource query in `server/src/controllers/analyticsController.ts` needs alignment with the Mongoose schema definition.
+2. Subject curriculum coverage metrics in `server/src/controllers/analyticsController.ts` need accurate calculation.
+3. Leaderboard rankings need deterministic tie-breaking and 1-based indexing.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 16: Improve Upload Flow Reliability.
-- **Immediate Next Task:** Task 17: Validate Storage Direct PUT (`client/src/components/UploadModal.tsx`).
+- **Current Task:** Completed Task 17: Validate Storage Direct PUT (`client/src/components/UploadModal.tsx`).
+- **Immediate Next Task:** Task 18: Align Verified Resource Query (`server/src/controllers/analyticsController.ts`).
