@@ -49,7 +49,14 @@ export const getMentors = async (_req: Request, res: Response): Promise<void> =>
 
 export const requestMentorship = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const studentId = req.user?._id || '650000000000000000000001';
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to request mentorship.' },
+      });
+      return;
+    }
+    const studentId = req.user._id;
     const { mentorUserId, subjectId, message, scheduledAt } = req.body;
 
     const request = await MentorshipRequest.create({

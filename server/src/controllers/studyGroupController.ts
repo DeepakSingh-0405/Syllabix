@@ -40,7 +40,14 @@ export const getStudyGroups = async (req: Request, res: Response): Promise<void>
 
 export const createStudyGroup = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const ownerId = req.user?._id || '650000000000000000000001';
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to create a study group.' },
+      });
+      return;
+    }
+    const ownerId = req.user._id;
     const { name, subjectId, schedule, activeTopic, visibility = 'public' } = req.body;
 
     const group = await StudyGroup.create({

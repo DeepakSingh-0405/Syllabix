@@ -34,16 +34,21 @@ export const verifySupabaseToken = async (
     // Support demo/local testing tokens only in non-production environments
     if (isDemoAllowed && (token === 'demo-bearer-token' || token.startsWith('demo-'))) {
       const demoId = 'demo-student-id-001';
-      let demoUser = await User.findOne({ supabaseUserId: demoId });
-      if (!demoUser) {
-        demoUser = await User.create({
-          _id: new mongoose.Types.ObjectId('650000000000000000000001'),
-          supabaseUserId: demoId,
-          email: 'student@syllabix.edu',
-          name: 'Aarav Mehta (Student)',
-          role: 'student',
-          reputationPoints: 120,
-        }).catch(() => null);
+      let demoUser: any = null;
+      try {
+        demoUser = await User.findOne({ supabaseUserId: demoId });
+        if (!demoUser) {
+          demoUser = await User.create({
+            _id: new mongoose.Types.ObjectId('650000000000000000000001'),
+            supabaseUserId: demoId,
+            email: 'student@syllabix.edu',
+            name: 'Aarav Mehta (Student)',
+            role: 'student',
+            reputationPoints: 120,
+          }).catch(() => null);
+        }
+      } catch {
+        // Database offline in unit tests / startup
       }
       req.supabaseUser = { id: demoId, email: 'student@syllabix.edu' };
       req.user = demoUser || ({ _id: new mongoose.Types.ObjectId('650000000000000000000001'), name: 'Aarav Mehta (Student)', role: 'student', reputationPoints: 120 } as any);

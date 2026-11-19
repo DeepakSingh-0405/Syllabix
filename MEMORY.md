@@ -55,7 +55,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Phase 0:** Initial Project Safety Check & Documentation Milestone (COMPLETED)
 - [x] **Task 01:** Fix PDF Document Parsing (COMPLETED - integrated pdf-parse v2 PDFParse class)
 - [x] **Task 02:** Normalize API Response Contract (COMPLETED - leaderboard & analytics responses standardized)
-- [ ] **Task 03:** Fix Demo Authentication Session Handling in `api.ts`
+- [x] **Task 03:** Fix Demo Authentication Session Handling in `api.ts` (COMPLETED - demo session resolution & write guard)
+- [ ] **Task 04:** Fix Demo Token Security (Strict production restriction)
 - [ ] **Task 03:** Fix Demo Authentication Session Handling
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
@@ -79,5 +80,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 02: Normalize API Response Contract.
-- **Immediate Next Task:** Task 03: Fix Demo Authentication Session Handling in `client/src/context/AuthContext.tsx` and `client/src/lib/api.ts`.
+- **Current Task:** Completed Task 03: Fix Demo Authentication Session Handling.
+- **Immediate Next Task:** Task 04: Fix Demo Token Security (ensure demo tokens are strictly rejected in production runtime) in `server/src/middleware/auth.ts`.

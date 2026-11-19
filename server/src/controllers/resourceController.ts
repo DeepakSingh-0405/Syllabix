@@ -54,10 +54,17 @@ export const getResources = async (req: Request, res: Response): Promise<void> =
 // 2. Request Upload Intent (Creates Supabase Storage Signed Upload URL)
 export const requestUploadIntent = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const rawUserId = req.user?._id;
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to upload resources.' },
+      });
+      return;
+    }
+    const rawUserId = req.user._id;
     const userId = (rawUserId && mongoose.Types.ObjectId.isValid(rawUserId.toString()))
       ? (typeof rawUserId === 'string' ? new mongoose.Types.ObjectId(rawUserId) : rawUserId)
-      : new mongoose.Types.ObjectId('650000000000000000000001');
+      : rawUserId;
 
     const {
       title,

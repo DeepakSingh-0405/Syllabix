@@ -23,7 +23,14 @@ export const getDiscussions = async (req: Request, res: Response): Promise<void>
 
 export const createDiscussion = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const authorId = req.user?._id || '650000000000000000000001';
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to create a discussion.' },
+      });
+      return;
+    }
+    const authorId = req.user._id;
     const { subjectId, title, body, tags } = req.body;
     const discussion = await Discussion.create({
       subjectId,
@@ -41,7 +48,14 @@ export const createDiscussion = async (req: AuthenticatedRequest, res: Response)
 
 export const addComment = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const authorId = req.user?._id || '650000000000000000000001';
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to post a comment.' },
+      });
+      return;
+    }
+    const authorId = req.user._id;
     const { id } = req.params; // discussionId
     const { body } = req.body;
 
