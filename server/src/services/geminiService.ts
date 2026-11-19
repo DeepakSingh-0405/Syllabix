@@ -6,6 +6,19 @@ import {
 } from '../data/curriculumData';
 import { env } from '../config/env';
 
+export const GEMINI_CONFIG = {
+  DEFAULT_MODEL: 'gemini-1.5-flash',
+  EMBEDDING_MODEL: 'text-embedding-004',
+} as const;
+
+export function getActiveTextModel(): string {
+  return process.env.GEMINI_MODEL || env.GEMINI_MODEL || GEMINI_CONFIG.DEFAULT_MODEL;
+}
+
+export function getActiveEmbeddingModel(): string {
+  return process.env.GEMINI_EMBEDDING_MODEL || env.GEMINI_EMBEDDING_MODEL || GEMINI_CONFIG.EMBEDDING_MODEL;
+}
+
 export interface GroundedRAGResult {
   answer: string;
   citedChunks: {
@@ -80,47 +93,47 @@ export class GeminiService {
     const apiKey = this.getApiKey();
     if (!apiKey) return null;
 
-    for (const modelName of ['gemini-3.8-flash', 'gemini-1.5-flash']) {
-      try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-goog-api-key': apiKey,
-            },
-            signal: AbortSignal.timeout(timeoutMs),
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig,
-            }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
-            return { text, model: modelName };
-          }
+    const modelName = getActiveTextModel();
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey,
+          },
+          signal: AbortSignal.timeout(timeoutMs),
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig,
+          }),
         }
-      } catch (err) {
-        console.warn(`[GeminiService] Error calling ${modelName}:`, err);
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          return { text, model: modelName };
+        }
       }
+    } catch (err) {
+      console.warn(`[GeminiService] Error calling ${modelName}:`, err);
     }
     return null;
   }
 
   /**
-   * Generates a vector embedding using Gemini gemini-embedding-001 securely via headers
+   * Generates a vector embedding using Gemini text-embedding-004 securely via headers
    */
   async generateEmbedding(text: string): Promise<number[]> {
     const apiKey = this.getApiKey();
     if (apiKey) {
+      const embeddingModel = getActiveEmbeddingModel();
       try {
         const response = await fetch(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent',
+          `https://generativelanguage.googleapis.com/v1beta/models/${embeddingModel}:embedContent`,
           {
             method: 'POST',
             headers: {
@@ -129,7 +142,7 @@ export class GeminiService {
             },
             signal: AbortSignal.timeout(10000),
             body: JSON.stringify({
-              model: 'models/gemini-embedding-001',
+              model: `models/${embeddingModel}`,
               content: { parts: [{ text: text.slice(0, 2048) }] },
             }),
           }
@@ -141,7 +154,7 @@ export class GeminiService {
           return values.slice(0, 768);
         }
       } catch (err) {
-        console.warn('[GeminiService] Error calling gemini-embedding-001, using deterministic vector:', err);
+        console.warn(`[GeminiService] Error calling ${embeddingModel}, using deterministic vector:`, err);
       }
     }
 
@@ -688,7 +701,7 @@ Output strictly valid JSON as an array of objects:
           excerpt: `Curriculum standards and foundational principles governing ${effectiveSubject}.`,
         },
       ],
-      model: 'gemini-3.8-flash (dynamic context synthesis)',
+      model: `${getActiveTextModel()} (dynamic context synthesis)`,
     };
   }
 
@@ -783,7 +796,7 @@ ${u.highYieldConcepts.map((h) => `- ${h}`).join('\n')}
         unitBreakdown,
         examPrepTips: curriculum.examPrepTips,
         structuredNotes,
-        model: 'gemini-3.8-flash (dynamic curriculum synthesis)',
+        model: `${getActiveTextModel()} (dynamic curriculum synthesis)`,
       };
     }
 
@@ -924,7 +937,9 @@ ${u.highYieldConcepts.map((h) => `- ${h}`).join('\n')}
       ],
       structuredNotes: `### Executive Revision Guide: ${subjectName} (${subjectCode})\n\n` +
         unitMatches.map((u) => `#### ${u.unit}\n${u.topics.map((t) => `- ${t}`).join('\n')}`).join('\n\n'),
-      model: hasCustomText ? 'gemini-3.8-flash (custom-document-grounded)' : 'gemini-3.8-flash (dynamic context synthesis)',
+      model: hasCustomText
+        ? `${getActiveTextModel()} (custom-document-grounded)`
+        : `${getActiveTextModel()} (dynamic context synthesis)`,
     };
   }
 
@@ -992,7 +1007,7 @@ ${u.highYieldConcepts.map((h) => `- ${h}`).join('\n')}
         subjectCode: curriculum.code,
         difficulty,
         questions: questions.slice(0, count),
-        model: 'gemini-3.8-flash (curriculum-grounded)',
+        model: `${getActiveTextModel()} (curriculum-grounded)`,
       };
     }
 
@@ -1128,7 +1143,9 @@ ${u.highYieldConcepts.map((h) => `- ${h}`).join('\n')}
       subjectCode,
       difficulty,
       questions: questions.slice(0, count),
-      model: hasCustomText ? 'gemini-3.8-flash (custom-document-grounded)' : 'gemini-3.8-flash (dynamic context synthesis)',
+      model: hasCustomText
+        ? `${getActiveTextModel()} (custom-document-grounded)`
+        : `${getActiveTextModel()} (dynamic context synthesis)`,
     };
   }
 

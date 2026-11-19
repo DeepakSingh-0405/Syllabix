@@ -20,6 +20,8 @@ const envSchema = z.object({
 
   // Google Gemini API Key — Must be provided via environment variables
   GEMINI_API_KEY: z.string().optional().or(z.literal('')),
+  GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
+  GEMINI_EMBEDDING_MODEL: z.string().default('text-embedding-004'),
 
   // Redis Cache
   REDIS_URL: z.string().default('redis://localhost:6379'),
@@ -52,6 +54,8 @@ export const env = parsedEnv.success
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || '',
       GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+      GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+      GEMINI_EMBEDDING_MODEL: process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004',
       REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
       ALLOW_DEMO_TOKENS: process.env.ALLOW_DEMO_TOKENS === 'true',
     };

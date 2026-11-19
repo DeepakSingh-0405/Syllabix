@@ -83,7 +83,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 23:** Handle Mongo Disconnect Gracefully (COMPLETED - lifecycle listeners, reconnect scheduling, zero unhandled errors)
 - [x] **Task 24:** Expand Health Check Status (COMPLETED - deep checks for MongoDB, Supabase, Gemini, uptime, degraded state)
 - [x] **Phase 7 (Tasks 21–24):** Database & Backend Reliability (COMPLETED)
-- [ ] **Task 25:** Enforce Model Configuration (`server/src/services/geminiService.ts`)
+- [x] **Task 25:** Enforce Model Configuration (COMPLETED - canonical gemini-1.5-flash & text-embedding-004 models, zero non-existent model strings)
 - [ ] **Task 26:** Normalize Gemini API Error Handling (`server/src/services/geminiService.ts`)
 - [ ] **Task 27:** Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`)
 - [ ] **Task 28:** Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`)
@@ -95,11 +95,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Gemini AI generation and embedding calls need strict model configuration and error normalization.
-2. Chunk selection needs context-window budget management for large document corpora.
+1. Gemini API errors (rate limits, quotas, 429/503) need normalized error mapping and consistent fallbacks.
+2. Context window chunk selection needs budget enforcement and deduplication.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 24: Expand Health Check Status (`server/src/routes/index.ts`).
-- **Immediate Next Task:** Task 25: Enforce Model Configuration (`server/src/services/geminiService.ts`).
+- **Current Task:** Completed Task 25: Enforce Model Configuration (`server/src/services/geminiService.ts`).
+- **Immediate Next Task:** Task 26: Normalize Gemini API Error Handling (`server/src/services/geminiService.ts`).
