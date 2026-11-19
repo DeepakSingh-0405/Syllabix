@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -51,8 +51,29 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Realtime channel for live study hub presence
-  const { onlineUsers } = useRealtimeChannel(`study-hub-${activeRoomId || 'general'}`);
+  // Realtime broadcast listener for incoming messages from peer students
+  const handleIncomingBroadcast = useCallback((event: string, payload: any) => {
+    if ((event === 'new_message' || event === 'message') && payload && payload.text) {
+      setMessages((prev) => {
+        // Prevent duplicate if already received or sent
+        if (payload._id && prev.some((m) => m._id === payload._id)) return prev;
+        const isDuplicate = prev.some(
+          (m) =>
+            m.senderId === payload.senderId &&
+            m.text === payload.text &&
+            Math.abs(new Date(m.createdAt).getTime() - new Date(payload.createdAt).getTime()) < 3000
+        );
+        if (isDuplicate) return prev;
+        return [...prev, payload];
+      });
+    }
+  }, []);
+
+  // Realtime channel for live study hub chat and peer presence
+  const { onlineUsers, connectionState, broadcastEvent } = useRealtimeChannel(
+    activeRoomId ? `study-hub-${activeRoomId}` : '',
+    handleIncomingBroadcast
+  );
 
   // Fetch all study rooms
   const fetchRooms = async () => {
@@ -206,8 +227,10 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
     const messageText = inputMessage.trim();
     setInputMessage('');
 
+    const tempId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const optimisticMessage: ChatMessage = {
-      senderId: session?.user?.id || 'current-user',
+      _id: tempId,
+      senderId: profile?._id || session?.user?.id || 'current-user',
       senderName: profile?.name || session?.user?.email?.split('@')[0] || 'Me (Scholar)',
       senderRole: profile?.role || 'student',
       text: messageText,
@@ -218,11 +241,23 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
     setSending(true);
 
     try {
-      await api.post(`/study-groups/${activeRoomId}/messages`, {
+      const saved = await api.post<ChatMessage>(`/study-groups/${activeRoomId}/messages`, {
         text: messageText,
       });
+
+      const finalMessage = saved && saved.text ? saved : optimisticMessage;
+
+      if (saved && saved._id) {
+        setMessages((prev) =>
+          prev.map((m) => (m._id === tempId ? { ...saved, _id: saved._id } : m))
+        );
+      }
+
+      // Broadcast to all active participants in this study room
+      await broadcastEvent('new_message', finalMessage);
     } catch {
-      // Kept in optimistic local state
+      // Broadcast optimistic message even if backend request errored in local mode
+      await broadcastEvent('new_message', optimisticMessage);
     } finally {
       setSending(false);
     }
@@ -341,8 +376,24 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                   </p>
                 </div>
 
-                <div className="hidden sm:flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 text-[12px] text-text-secondary bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                <div className="flex items-center gap-2">
+                  {connectionState === 'connected' ? (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-green bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                      <span className="w-2 h-2 rounded-full bg-accent-green animate-pulse" />
+                      <span>Live Realtime</span>
+                    </span>
+                  ) : connectionState === 'connecting' || connectionState === 'reconnecting' ? (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-400 bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                      <span>Connecting...</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-tertiary bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                      <span className="w-2 h-2 rounded-full bg-text-disabled" />
+                      <span>Offline Mode</span>
+                    </span>
+                  )}
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[12px] text-text-secondary bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
                     <Sparkles className="w-3.5 h-3.5 text-text-secondary" />
                     <span>Live broadcast</span>
                   </span>
