@@ -80,7 +80,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Phase 6 (Tasks 18–20):** Analytics Dashboard & Leaderboard Rankings (COMPLETED)
 - [x] **Task 21:** Ensure Idempotent Database Seed (COMPLETED - unique-key check, centralized seedDatabase, zero duplicate insertions)
 - [x] **Task 22:** Assign Study Group Owner Correctly (COMPLETED - bound ownerId to authenticated req.user._id and added to memberIds)
-- [ ] **Task 23:** Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`)
+- [x] **Task 23:** Handle Mongo Disconnect Gracefully (COMPLETED - lifecycle listeners, reconnect scheduling, zero unhandled errors)
 - [ ] **Task 24:** Expand Health Check Status (`server/src/routes/index.ts`)
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
@@ -90,11 +90,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. MongoDB disconnect handling needs graceful auto-recovery, fail-fast buffering disable, and health reporting.
-2. Health check route `/api/health` needs deep status checking for MongoDB and Supabase.
+1. Health check route `/api/health` needs deep status checking for MongoDB, Supabase, and Gemini AI.
+2. AI Assistant parameters and prompt limits need fine-tuning and strict schema enforcement.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 22: Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`).
-- **Immediate Next Task:** Task 23: Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`).
+- **Current Task:** Completed Task 23: Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`).
+- **Immediate Next Task:** Task 24: Expand Health Check Status (`server/src/routes/index.ts`).
