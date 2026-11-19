@@ -94,17 +94,19 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Phase 9 (Tasks 30–31):** User Onboarding & Resilience (COMPLETED)
 - [x] **Task 32:** Provide Booking Confirmation Feedback (COMPLETED - rich confirmation card, live chat action, duplicate submission prevention, dismissible error banner)
 - [x] **Task 33:** Add Notification Badge Counter (COMPLETED - reactive numerical badge with 9+ cap, dynamic aria-label, item mark-as-read, click-outside dismissal)
-- [ ] **Task 34:** Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`)
-- [ ] **Tasks 35–36:** Subject Directory Semester/Branch Filters & Upload Modal Trigger
+- [x] **Task 34:** Implement SM-2 Review Interval Scheduling (COMPLETED - pure calculateSM2Review, falsy 0 fix, EF >= 1.3 floor, exact progression math, due date scheduling)
+- [ ] **Task 35:** Add Semester and Branch Filters (`client/src/pages/SubjectDirectoryPage.tsx`)
+- [ ] **Task 36:** Link Upload Modal from Subject Page (`client/src/pages/SubjectDirectoryPage.tsx`)
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Flashcard review interval calculation needs complete SuperMemo SM-2 repetition, ease-factor, and next due date scheduling.
+1. Subject Directory needs semester and branch filtering controls to narrow down curriculum courses.
+2. Subject Directory needs quick-action upload modal triggers.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 33: Add Notification Badge Counter (`client/src/components/NotificationBell.tsx`).
-- **Immediate Next Task:** Task 34: Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`).
+- **Current Task:** Completed Task 34: Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`).
+- **Immediate Next Task:** Task 35: Add Semester and Branch Filters (`client/src/pages/SubjectDirectoryPage.tsx`).

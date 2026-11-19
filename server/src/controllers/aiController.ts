@@ -684,6 +684,65 @@ export const getOrCreateFlashcardDeck = async (req: AuthenticatedRequest, res: R
   }
 };
 
+export interface SM2Result {
+  interval: number;
+  repetition: number;
+  easeFactor: number;
+  nextDueDate: Date;
+}
+
+/**
+ * SuperMemo SM-2 Spaced Repetition Scheduling Algorithm:
+ * - EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
+ * - Minimum ease factor floor: 1.3
+ * - Quality score clamped to [0, 5] (safe against falsy 0 values)
+ * - Progression: Rep 0 -> 1 day; Rep 1 -> 6 days; Rep >= 2 -> round(interval * EF)
+ * - Lapse (q < 3): Repetition resets to 0, interval resets to 1 day
+ */
+export function calculateSM2Review(
+  currentEaseFactor: number = 2.5,
+  currentRepetition: number = 0,
+  currentInterval: number = 1,
+  quality: number = 3,
+  baseDate: Date = new Date()
+): SM2Result {
+  const rawQ = Number(quality);
+  const q = isNaN(rawQ) ? 3 : Math.max(0, Math.min(5, Math.round(rawQ)));
+
+  // Calculate new SM-2 Ease Factor
+  let newEF = currentEaseFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  if (newEF < 1.3) newEF = 1.3;
+  newEF = Number(newEF.toFixed(2));
+
+  let newInterval: number;
+  let newRepetition = currentRepetition;
+
+  if (q >= 3) {
+    if (newRepetition === 0) {
+      newInterval = 1;
+    } else if (newRepetition === 1) {
+      newInterval = 6;
+    } else {
+      newInterval = Math.max(1, Math.round(currentInterval * newEF));
+    }
+    newRepetition += 1;
+  } else {
+    // Lapse / Failure: reset repetition count and interval
+    newRepetition = 0;
+    newInterval = 1;
+  }
+
+  const nextDueDate = new Date(baseDate.getTime());
+  nextDueDate.setDate(nextDueDate.getDate() + newInterval);
+
+  return {
+    interval: newInterval,
+    repetition: newRepetition,
+    easeFactor: newEF,
+    nextDueDate,
+  };
+}
+
 // 5. Spaced Repetition Review Assessment (SuperMemo SM-2 Algorithm)
 export const reviewFlashcard = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -741,45 +800,27 @@ export const reviewFlashcard = async (req: AuthenticatedRequest, res: Response):
       return;
     }
 
-    const q = Math.max(0, Math.min(5, Number(quality) || 3));
+    const sm2Result = calculateSM2Review(
+      card.easeFactor || 2.5,
+      card.repetition || 0,
+      card.interval || 1,
+      quality
+    );
 
-    // Calculate new SM-2 Ease Factor: EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
-    let newEF = card.easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-    if (newEF < 1.3) newEF = 1.3;
-
-    let newInterval: number;
-    let newRepetition = card.repetition;
-
-    if (q >= 3) {
-      if (newRepetition === 0) {
-        newInterval = 1;
-      } else if (newRepetition === 1) {
-        newInterval = 6;
-      } else {
-        newInterval = Math.round(card.interval * newEF);
-      }
-      newRepetition += 1;
-    } else {
-      newRepetition = 0;
-      newInterval = 1;
-    }
-
-    const nextDueDate = new Date();
-    nextDueDate.setDate(nextDueDate.getDate() + newInterval);
-
-    card.easeFactor = Number(newEF.toFixed(2));
-    card.interval = newInterval;
-    card.repetition = newRepetition;
-    card.dueDate = nextDueDate;
+    card.easeFactor = sm2Result.easeFactor;
+    card.interval = sm2Result.interval;
+    card.repetition = sm2Result.repetition;
+    card.dueDate = sm2Result.nextDueDate;
     await card.save();
 
     res.json({
       success: true,
       data: {
         cardId: card._id,
-        intervalDays: newInterval,
-        nextDueDate,
-        repetition: newRepetition,
+        intervalDays: sm2Result.interval,
+        nextDueDate: sm2Result.nextDueDate,
+        repetition: sm2Result.repetition,
+        easeFactor: sm2Result.easeFactor,
       },
     });
   } catch (err: any) {
