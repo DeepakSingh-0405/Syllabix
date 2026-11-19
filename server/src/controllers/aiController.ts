@@ -583,6 +583,17 @@ export const reviewFlashcard = async (req: AuthenticatedRequest, res: Response):
     const { cardId } = req.params;
     const { quality } = req.body; // 0 to 5 score (SuperMemo SM-2)
 
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to review flashcards.',
+        },
+      });
+      return;
+    }
+
     const card = await Flashcard.findById(cardId);
     if (!card) {
       res.status(404).json({
@@ -590,6 +601,34 @@ export const reviewFlashcard = async (req: AuthenticatedRequest, res: Response):
         error: {
           code: 'NOT_FOUND',
           message: 'Flashcard not found',
+        },
+      });
+      return;
+    }
+
+    // Verify deck ownership or administrator role
+    const deck = await FlashcardDeck.findById(card.deckId);
+    if (!deck) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Associated flashcard deck not found',
+        },
+      });
+      return;
+    }
+
+    const currentUserId = req.user._id?.toString();
+    const isOwner = currentUserId && String(deck.ownerId) === currentUserId;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Forbidden: you can only review flashcards from your own deck',
         },
       });
       return;

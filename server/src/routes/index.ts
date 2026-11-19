@@ -117,7 +117,7 @@ router.post(
 router.get('/ai/flashcards/:subjectId', optionalSupabaseToken, aiController.getOrCreateFlashcardDeck);
 router.post(
   '/ai/flashcards/:cardId/review',
-  optionalSupabaseToken,
+  verifySupabaseToken,
   validate(
     z.object({
       quality: z.number().min(0).max(5),

@@ -59,7 +59,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 04:** Fix Demo Token Security (COMPLETED - strict production restriction & exact token whitelist)
 - [x] **Task 05:** Fix Mentorship Chat Authorization (COMPLETED - participant ownership & 401/403 validation)
 - [x] **Task 06:** Fix Private Document Access (COMPLETED - private document ownership/admin enforcement & public download access)
-- [ ] **Task 07:** Fix Flashcard Permissions (`server/src/controllers/aiController.ts` - ensure review belongs to deck owner)
+- [x] **Task 07:** Fix Flashcard Permissions (COMPLETED - flashcard review ownership enforcement)
+- [ ] **Task 08:** Prevent Reputation Manipulation (`server/src/controllers/discussionController.ts` - accept answer ownership & once-only check)
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
 - [ ] **Tasks 14–15:** Real-Time Study Room Chat & Presence
@@ -82,5 +83,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 06: Fix Private Document Access.
-- **Immediate Next Task:** Task 07: Fix Flashcard Permissions (`server/src/controllers/aiController.ts` - ensure review belongs to deck owner).
+- **Current Task:** Completed Task 07: Fix Flashcard Permissions.
+- **Immediate Next Task:** Task 08: Prevent Reputation Manipulation (`server/src/controllers/discussionController.ts` - accept answer ownership & once-only check).
