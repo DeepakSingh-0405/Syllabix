@@ -141,6 +141,7 @@ router.post(
   ),
   discussionController.createDiscussion
 );
+router.get('/discussions/:id/comments', discussionController.getComments);
 router.post(
   '/discussions/:id/comments',
   optionalSupabaseToken,

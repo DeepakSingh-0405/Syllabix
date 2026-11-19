@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed PDF document parsing in `server/src/services/documentParser.ts` by updating to `pdf-parse` v2 constructor and API, enabling multi-page extraction and graceful error handling.
 
 ### Added
+- Implemented discussion comment loading in `server/src/controllers/discussionController.ts`, `server/src/routes/index.ts`, and `client/src/pages/DiscussionsPage.tsx`: added `GET /discussions/:id/comments` endpoint sorting accepted solutions first, with responsive loading skeletons, comment count synchronization, and author reputation display.
 - Comprehensive project documentation suite (`README.md`, `MEMORY.md`, `CONTRIBUTING.md`, `SECURITY.md`, and technical specifications in `docs/`).
 - GitHub CI actions workflow (`.github/workflows/ci.yml`) and issue/PR templates.
 - Root `.env.example` template covering backend and client configurations.

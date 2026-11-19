@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { MessageSquare, ThumbsUp, CheckCircle2, Plus, Send, Clock } from 'lucide-react';
+import { MessageSquare, ThumbsUp, CheckCircle2, Plus, Send, Clock, Loader2 } from 'lucide-react';
 
 interface DiscussionComment {
   _id: string;
@@ -10,6 +10,8 @@ interface DiscussionComment {
     _id: string;
     name: string;
     role: string;
+    avatarUrl?: string;
+    reputationPoints?: number;
   };
   body: string;
   isAcceptedAnswer: boolean;
@@ -25,6 +27,7 @@ interface Discussion {
     _id: string;
     name: string;
     role: string;
+    reputationPoints?: number;
   };
   subjectId: {
     _id: string;
@@ -33,8 +36,11 @@ interface Discussion {
   };
   tags: string[];
   upvotes: number;
-  resolved: boolean;
-  comments: DiscussionComment[];
+  resolved?: boolean;
+  status?: 'open' | 'resolved' | 'closed';
+  acceptedAnswerId?: string;
+  comments?: DiscussionComment[];
+  commentCount?: number;
   createdAt: string;
 }
 
@@ -52,6 +58,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
   // Comment input state
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
 
   // New doubt modal state
   const [showAskModal, setShowAskModal] = useState(false);
@@ -60,6 +67,26 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
   const [newSubjectId, setNewSubjectId] = useState(subjects[0]?._id || '');
   const [newTags, setNewTags] = useState('');
   const [asking, setAsking] = useState(false);
+
+  const fetchCommentsForDiscussion = useCallback(async (discussionId: string) => {
+    if (!discussionId || discussionId.startsWith('d') || discussionId.startsWith('disc-')) {
+      // Local seed or optimistic discussion
+      return;
+    }
+    setCommentsLoading(true);
+    try {
+      const data = await api.get<DiscussionComment[]>(`/discussions/${discussionId}/comments`);
+      if (Array.isArray(data)) {
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === discussionId ? { ...d, comments: data } : d))
+        );
+      }
+    } catch (err) {
+      console.warn('[DiscussionsPage] Error fetching comments for discussion:', err);
+    } finally {
+      setCommentsLoading(false);
+    }
+  }, []);
 
   const fetchDiscussions = async () => {
     try {
@@ -149,6 +176,12 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
     fetchDiscussions();
   }, [selectedSubjectId]);
 
+  useEffect(() => {
+    if (activeDiscussionId) {
+      fetchCommentsForDiscussion(activeDiscussionId);
+    }
+  }, [activeDiscussionId, fetchCommentsForDiscussion]);
+
   // Handle Ask New Doubt
   const handleAskDoubt = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,7 +269,20 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
     );
 
     try {
-      await api.post(`/discussions/${activeDiscussionId}/comments`, { body: text });
+      const created = await api.post<DiscussionComment>(`/discussions/${activeDiscussionId}/comments`, { body: text });
+      if (created && created._id) {
+        setDiscussions((prev) =>
+          prev.map((d) =>
+            d._id === activeDiscussionId
+              ? {
+                  ...d,
+                  comments: (d.comments || []).map((c) => (c._id === newComment._id ? created : c)),
+                  commentCount: (d.commentCount || 0) + 1,
+                }
+              : d
+          )
+        );
+      }
     } catch {
       // Retained optimistically
     } finally {
@@ -392,12 +438,19 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
               {/* Answers & Solutions List */}
               <div className="flex-1 overflow-y-auto p-space-4 space-y-space-3 bg-surface-base/40">
                 <div className="flex items-center justify-between pb-1 border-b border-border-default">
-                  <span className="text-[12px] uppercase font-semibold text-text-tertiary tracking-wider">
-                    Community solutions ({activeDiscussion.comments?.length || 0})
+                  <span className="text-[12px] uppercase font-semibold text-text-tertiary tracking-wider flex items-center gap-2">
+                    <span>Community solutions ({activeDiscussion.comments?.length || 0})</span>
+                    {commentsLoading && <Loader2 className="w-3 h-3 animate-spin text-text-tertiary" />}
                   </span>
                 </div>
 
-                {activeDiscussion.comments && activeDiscussion.comments.length > 0 ? (
+                {commentsLoading ? (
+                  <div className="space-y-3 py-2">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <div key={i} className="h-24 bg-surface-muted border border-border-default rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : activeDiscussion.comments && activeDiscussion.comments.length > 0 ? (
                   activeDiscussion.comments.map((comment) => (
                     <div
                       key={comment._id}
@@ -415,6 +468,11 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                           <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-base rounded border border-border-default">
                             {comment.authorId?.role || 'student'}
                           </span>
+                          {comment.authorId?.reputationPoints !== undefined && (
+                            <span className="text-[11px] font-medium text-text-tertiary">
+                              {comment.authorId.reputationPoints} pts
+                            </span>
+                          )}
                         </div>
                         {comment.isAcceptedAnswer && (
                           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">

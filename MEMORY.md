@@ -64,7 +64,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 09:** Sanitize Search Expressions (COMPLETED - escape regex special characters across search and lookup endpoints)
 - [x] **Task 10:** Sanitize Server Error Responses (COMPLETED - suppress stack trace and internal message leaks in production)
 - [x] **Phase 2 (Tasks 04–10):** Security & Authorization Hardening (COMPLETED)
-- [ ] **Task 11:** Implement Discussion Answer Loading (`client/src/pages/DiscussionsPage.tsx` - fetch and render thread comments)
+- [x] **Task 11:** Implement Discussion Answer Loading (COMPLETED - `GET /discussions/:id/comments` endpoint, comment fetching, loading skeletons, author reputation)
 - [ ] **Task 12:** Add Accept Answer UI Action (`client/src/pages/DiscussionsPage.tsx` - author action to mark solution)
 - [ ] **Task 13:** Add Discussion Resolution Indicator (`client/src/pages/DiscussionsPage.tsx` - resolved badges and accepted styling)
 - [ ] **Tasks 14–15:** Real-Time Study Room Chat & Presence
@@ -86,5 +86,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 10: Sanitize Server Error Responses.
-- **Immediate Next Task:** Task 11: Implement Discussion Answer Loading (`client/src/pages/DiscussionsPage.tsx`).
+- **Current Task:** Completed Task 11: Implement Discussion Answer Loading.
+- **Immediate Next Task:** Task 12: Add Accept Answer UI Action (`client/src/pages/DiscussionsPage.tsx`).

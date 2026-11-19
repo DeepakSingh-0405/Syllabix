@@ -74,6 +74,20 @@ export const addComment = async (req: AuthenticatedRequest, res: Response): Prom
   }
 };
 
+export const getComments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params; // discussionId
+    const comments = await Comment.find({ discussionId: id })
+      .populate('authorId', 'name avatarUrl reputationPoints role')
+      .sort({ isAcceptedAnswer: -1, createdAt: 1 })
+      .lean();
+
+    res.json({ success: true, data: comments });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: { message: err.message } });
+  }
+};
+
 export const acceptAnswer = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
