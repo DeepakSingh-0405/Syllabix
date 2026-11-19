@@ -27,6 +27,12 @@ export default {
           error: 'var(--color-status-error)',
           errorSurface: 'var(--color-status-errorSurface)',
         },
+        accent: {
+          DEFAULT: 'rgb(var(--color-accent-rgb) / <alpha-value>)',
+          strong: 'rgb(var(--color-accent-strong-rgb) / <alpha-value>)',
+          cyan: 'rgb(var(--color-accent-cyan-rgb) / <alpha-value>)',
+          green: 'rgb(var(--color-accent-green-rgb) / <alpha-value>)',
+        },
       },
       spacing: {
         'space-1': 'var(--space-1)',
