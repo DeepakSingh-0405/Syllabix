@@ -59,6 +59,8 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
+  const [acceptingCommentId, setAcceptingCommentId] = useState<string | null>(null);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   // New doubt modal state
   const [showAskModal, setShowAskModal] = useState(false);
@@ -290,7 +292,68 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
     }
   };
 
+  const handleAcceptAnswer = async (commentId: string) => {
+    if (!activeDiscussionId || acceptingCommentId) return;
+    setAcceptingCommentId(commentId);
+    setAcceptError(null);
+
+    try {
+      await api.patch(`/discussions/${activeDiscussionId}/accept-answer`, { commentId });
+
+      setDiscussions((prev) =>
+        prev.map((d) => {
+          if (d._id !== activeDiscussionId) return d;
+
+          const updatedComments = (d.comments || []).map((c) => {
+            if (c._id === commentId) {
+              return {
+                ...c,
+                isAcceptedAnswer: true,
+                authorId: {
+                  ...c.authorId,
+                  reputationPoints: (c.authorId?.reputationPoints || 0) + 15,
+                },
+              };
+            }
+            return c;
+          });
+
+          // Sort accepted answer to top of solution list
+          updatedComments.sort((a, b) => (b.isAcceptedAnswer ? 1 : 0) - (a.isAcceptedAnswer ? 1 : 0));
+
+          return {
+            ...d,
+            resolved: true,
+            status: 'resolved',
+            acceptedAnswerId: commentId,
+            comments: updatedComments,
+          };
+        })
+      );
+    } catch (err: any) {
+      console.error('[DiscussionsPage] Failed to accept answer:', err);
+      setAcceptError(err.message || 'Failed to accept answer.');
+    } finally {
+      setAcceptingCommentId(null);
+    }
+  };
+
   const activeDiscussion = discussions.find((d) => d._id === activeDiscussionId) || discussions[0];
+
+  const currentUserId = profile?._id || profile?.supabaseUserId || session?.user?.id;
+  const discussionAuthorId = typeof activeDiscussion?.authorId === 'object'
+    ? activeDiscussion?.authorId?._id
+    : activeDiscussion?.authorId;
+  const isDiscussionAuthor = Boolean(
+    currentUserId && discussionAuthorId && String(discussionAuthorId) === String(currentUserId)
+  );
+
+  const hasAcceptedAnswer = Boolean(
+    activeDiscussion?.acceptedAnswerId ||
+    activeDiscussion?.resolved ||
+    activeDiscussion?.status === 'resolved' ||
+    activeDiscussion?.comments?.some((c) => c.isAcceptedAnswer)
+  );
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-space-4 py-space-4 flex flex-col flex-1 min-h-[calc(100vh-60px)]">
@@ -366,7 +429,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                       <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
                         {d.subjectId?.code || 'CS-COURSE'}
                       </span>
-                      {d.resolved ? (
+                      {d.resolved || d.status === 'resolved' || d.acceptedAnswerId ? (
                         <span className="inline-flex items-center gap-1 text-[11px] text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">
                           <CheckCircle2 className="w-3 h-3 text-text-secondary" />
                           <span>Resolved</span>
@@ -444,6 +507,19 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                   </span>
                 </div>
 
+                {acceptError && (
+                  <div className="p-2 text-[12px] text-status-error bg-status-errorSurface border border-status-error rounded-md flex items-center justify-between">
+                    <span>{acceptError}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAcceptError(null)}
+                      className="text-[11px] text-status-error hover:underline ml-2"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+
                 {commentsLoading ? (
                   <div className="space-y-3 py-2">
                     {Array.from({ length: 2 }).map((_, i) => (
@@ -451,50 +527,79 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     ))}
                   </div>
                 ) : activeDiscussion.comments && activeDiscussion.comments.length > 0 ? (
-                  activeDiscussion.comments.map((comment) => (
-                    <div
-                      key={comment._id}
-                      className={`p-space-3 rounded-lg border space-y-2 ${
-                        comment.isAcceptedAnswer
-                          ? 'bg-surface-interactive border-border-interactive shadow-sm'
-                          : 'bg-surface-muted border-border-default'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-semibold text-text-secondary">
-                            {comment.authorId?.name}
-                          </span>
-                          <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-base rounded border border-border-default">
-                            {comment.authorId?.role || 'student'}
-                          </span>
-                          {comment.authorId?.reputationPoints !== undefined && (
-                            <span className="text-[11px] font-medium text-text-tertiary">
-                              {comment.authorId.reputationPoints} pts
+                  activeDiscussion.comments.map((comment) => {
+                    const commentAuthorId = typeof comment.authorId === 'object'
+                      ? comment.authorId?._id
+                      : comment.authorId;
+                    const isCommentAuthor = Boolean(
+                      currentUserId && commentAuthorId && String(commentAuthorId) === String(currentUserId)
+                    );
+
+                    return (
+                      <div
+                        key={comment._id}
+                        className={`p-space-3 rounded-lg border space-y-2 ${
+                          comment.isAcceptedAnswer
+                            ? 'bg-surface-interactive border-border-interactive shadow-sm'
+                            : 'bg-surface-muted border-border-default'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] font-semibold text-text-secondary">
+                              {comment.authorId?.name}
                             </span>
-                          )}
+                            <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-base rounded border border-border-default">
+                              {comment.authorId?.role || 'student'}
+                            </span>
+                            {comment.authorId?.reputationPoints !== undefined && (
+                              <span className="text-[11px] font-medium text-text-tertiary">
+                                {comment.authorId.reputationPoints} pts
+                              </span>
+                            )}
+                          </div>
+                          {comment.isAcceptedAnswer ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3 text-text-secondary" />
+                              <span>Accepted answer (+15 pts)</span>
+                            </span>
+                          ) : isDiscussionAuthor && !hasAcceptedAnswer && !isCommentAuthor ? (
+                            <button
+                              type="button"
+                              onClick={() => handleAcceptAnswer(comment._id)}
+                              disabled={acceptingCommentId !== null}
+                              className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary hover:text-text-secondary bg-surface-base hover:bg-surface-elevated border border-border-default hover:border-border-interactive px-2 py-0.5 rounded-full transition-colors disabled:opacity-40"
+                              title="Accept this answer as the verified solution (+15 reputation points)"
+                            >
+                              {acceptingCommentId === comment._id ? (
+                                <>
+                                  <Loader2 className="w-3 h-3 animate-spin text-text-secondary" />
+                                  <span>Accepting...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle2 className="w-3 h-3 text-text-tertiary hover:text-text-secondary" />
+                                  <span>Accept Answer</span>
+                                </>
+                              )}
+                            </button>
+                          ) : null}
                         </div>
-                        {comment.isAcceptedAnswer && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">
-                            <CheckCircle2 className="w-3 h-3 text-text-secondary" />
-                            <span>Accepted answer (+15 pts)</span>
+
+                        <p className="text-[13px] text-text-primary leading-relaxed whitespace-pre-line font-light">
+                          {comment.body}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-1 text-[11px] text-text-tertiary border-t border-border-default/40">
+                          <span>{new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className="flex items-center gap-1 text-text-secondary">
+                            <ThumbsUp className="w-3 h-3" />
+                            <span>{comment.upvotes} upvotes</span>
                           </span>
-                        )}
+                        </div>
                       </div>
-
-                      <p className="text-[13px] text-text-primary leading-relaxed whitespace-pre-line font-light">
-                        {comment.body}
-                      </p>
-
-                      <div className="flex items-center justify-between pt-1 text-[11px] text-text-tertiary border-t border-border-default/40">
-                        <span>{new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        <span className="flex items-center gap-1 text-text-secondary">
-                          <ThumbsUp className="w-3 h-3" />
-                          <span>{comment.upvotes} upvotes</span>
-                        </span>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="py-8 text-center text-text-tertiary text-[13px]">
                     No answers submitted yet. Be the first to help your fellow students!
