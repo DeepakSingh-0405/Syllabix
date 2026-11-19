@@ -47,18 +47,32 @@ export const createStudyGroup = async (req: AuthenticatedRequest, res: Response)
     const ownerId = req.user._id;
     const { name, subjectId, schedule, activeTopic, visibility = 'public' } = req.body;
 
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      res.status(400).json({
+        success: false,
+        error: { message: 'Study room name is required.' },
+      });
+      return;
+    }
+
     const group = await StudyGroup.create({
-      name,
+      name: name.trim(),
       subjectId,
       ownerId,
-      schedule: schedule || 'Mon, Wed, Fri 6:00 PM IST',
-      activeTopic: activeTopic || 'Exam Preparation & Doubt Clearance',
+      schedule: schedule?.trim() || 'Mon, Wed, Fri 6:00 PM IST',
+      activeTopic: activeTopic?.trim() || 'Exam Preparation & Doubt Clearance',
       visibility,
       memberIds: [ownerId],
       messages: [],
     });
 
-    res.status(201).json({ success: true, data: group });
+    const populatedGroup = await StudyGroup.findById(group._id)
+      .populate('subjectId', 'name code semester')
+      .populate('ownerId', 'name avatarUrl reputationPoints')
+      .lean()
+      .catch(() => null);
+
+    res.status(201).json({ success: true, data: populatedGroup || group });
   } catch (err: any) {
     res.status(500).json({ success: false, error: { message: err.message } });
   }

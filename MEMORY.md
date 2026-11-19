@@ -79,7 +79,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 20:** Normalize Leaderboard Ranking (COMPLETED - deterministic tie-breaking, 1-based competition ranks, and badge/tier alignment)
 - [x] **Phase 6 (Tasks 18–20):** Analytics Dashboard & Leaderboard Rankings (COMPLETED)
 - [x] **Task 21:** Ensure Idempotent Database Seed (COMPLETED - unique-key check, centralized seedDatabase, zero duplicate insertions)
-- [ ] **Task 22:** Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`)
+- [x] **Task 22:** Assign Study Group Owner Correctly (COMPLETED - bound ownerId to authenticated req.user._id and added to memberIds)
 - [ ] **Task 23:** Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`)
 - [ ] **Task 24:** Expand Health Check Status (`server/src/routes/index.ts`)
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
@@ -90,12 +90,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Study group creation needs authentic user ownership assignment.
-2. MongoDB disconnect handling needs graceful auto-recovery and health reporting.
-3. Health check route `/api/health` needs deep status checking for MongoDB and Supabase.
+1. MongoDB disconnect handling needs graceful auto-recovery, fail-fast buffering disable, and health reporting.
+2. Health check route `/api/health` needs deep status checking for MongoDB and Supabase.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 21: Ensure Idempotent Database Seed (`server/src/config/seed.ts`).
-- **Immediate Next Task:** Task 22: Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`).
+- **Current Task:** Completed Task 22: Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`).
+- **Immediate Next Task:** Task 23: Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`).
