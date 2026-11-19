@@ -145,7 +145,8 @@ export const AssistantPage: React.FC<AssistantPageProps> = ({ subjects }) => {
   }, [activeSubject]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const chatContainer = chatEndRef.current?.parentElement;
+    chatContainer?.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
 
   // Handle Document Attachment & Scanning with Binary PDF Guardrail
@@ -277,12 +278,15 @@ export const AssistantPage: React.FC<AssistantPageProps> = ({ subjects }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <label className="text-[12px] text-text-tertiary font-medium">Curriculum context:</label>
+        <div className="flex min-w-0 flex-col items-start gap-1.5 sm:flex-row sm:items-center">
+          <label htmlFor="assistant-subject" className="text-[12px] text-text-tertiary font-medium">
+            Curriculum context:
+          </label>
           <select
+            id="assistant-subject"
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="bg-surface-muted border border-border-interactive text-text-secondary text-[12px] px-2.5 py-1.5 rounded-md focus-visible:shadow-focus outline-none"
+            className="w-full min-w-0 max-w-full rounded-md border border-border-interactive bg-surface-muted px-2.5 py-1.5 text-[12px] text-text-secondary outline-none focus-visible:shadow-focus sm:w-auto"
           >
             {subjects.map((s) => (
               <option key={s._id} value={s._id}>
@@ -589,7 +593,7 @@ export const AssistantPage: React.FC<AssistantPageProps> = ({ subjects }) => {
                   ? `Ask any doubt about "${scannedDoc.name}"...`
                   : `Ask any doubt, concept, or algorithm problem...`
               }
-              className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[14px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:shadow-focus outline-none"
+              className="min-w-0 flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[14px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:shadow-focus outline-none"
             />
 
             <button
