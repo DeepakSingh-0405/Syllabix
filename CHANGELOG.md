@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Normalized API response contracts in `server/src/controllers/analyticsController.ts` and `client/src/lib/api.ts` to consistently wrap and unwrap `{ success: true, data: ... }`, ensuring leaderboard and institutional analytics render properly.
 - Fixed PDF document parsing in `server/src/services/documentParser.ts` by updating to `pdf-parse` v2 constructor and API, enabling multi-page extraction and graceful error handling.
 
 ### Added

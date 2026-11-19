@@ -22,9 +22,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   const json = await response.json();
   if (!response.ok) {
-    throw new Error(json.error?.message || `HTTP Error ${response.status}`);
+    const errorMsg = typeof json.error === 'string'
+      ? json.error
+      : (json.error?.message || json.message || `HTTP Error ${response.status}`);
+    throw new Error(errorMsg);
   }
-  return json.data;
+  return json.data !== undefined ? json.data : json;
 }
 
 export const api = {

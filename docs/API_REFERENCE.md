@@ -144,6 +144,40 @@ Errors return:
 ## 7. Gamification & Analytics
 ### `GET /gamification/leaderboard`
 - **Description:** Returns top ranked students based on academic contribution points.
+- **Response `200 OK`:**
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "rank": 1,
+        "_id": "u1",
+        "name": "Aarav Mehta",
+        "role": "student",
+        "reputationPoints": 185,
+        "badge": "Curriculum Pioneer",
+        "tier": "diamond"
+      }
+    ]
+  }
+  ```
 
 ### `GET /analytics/overview`
 - **Description:** Returns institutional resource coverage, active students, and verified syllabus metrics.
+- **Response `200 OK`:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "metrics": {
+        "totalSubjects": 9,
+        "verifiedResources": 24,
+        "vectorChunksIndexed": 482,
+        "activeStudyRooms": 6,
+        "discussionsResolved": 18,
+        "retrievalAccuracy": "98.4%"
+      },
+      "subjectCoverageList": [ ... ]
+    }
+  }
+  ```

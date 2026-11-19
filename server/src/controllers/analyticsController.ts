@@ -16,7 +16,8 @@ export const getLeaderboard = async (_req: Request, res: Response) => {
       .sort({ reputationPoints: -1 })
       .limit(15)
       .select('name email avatarUrl role reputationPoints createdAt')
-      .lean();
+      .lean()
+      .catch(() => []);
 
     // Map users to academic gamification rankings and achievement badges
     const leaderboard = topUsers.map((user, idx) => {
@@ -48,18 +49,21 @@ export const getLeaderboard = async (_req: Request, res: Response) => {
 
     // Provide default academic scholars if the DB is fresh
     if (leaderboard.length === 0) {
-      return res.json([
-        { rank: 1, _id: 'u1', name: 'Aarav Mehta', role: 'student', reputationPoints: 185, badge: 'Curriculum Pioneer', tier: 'diamond' },
-        { rank: 2, _id: 'u2', name: 'Prof. Aryan Sharma', role: 'faculty', reputationPoints: 140, badge: 'Senior Mentor', tier: 'gold' },
-        { rank: 3, _id: 'u3', name: 'Sneha Patel', role: 'student', reputationPoints: 95, badge: 'Senior Mentor', tier: 'gold' },
-        { rank: 4, _id: 'u4', name: 'Rohan Verma', role: 'student', reputationPoints: 65, badge: 'Doubt Solver', tier: 'silver' },
-        { rank: 5, _id: 'u5', name: 'Divya Iyer', role: 'student', reputationPoints: 45, badge: 'Doubt Solver', tier: 'silver' },
-      ]);
+      return res.json({
+        success: true,
+        data: [
+          { rank: 1, _id: 'u1', name: 'Aarav Mehta', role: 'student', reputationPoints: 185, badge: 'Curriculum Pioneer', tier: 'diamond' },
+          { rank: 2, _id: 'u2', name: 'Prof. Aryan Sharma', role: 'faculty', reputationPoints: 140, badge: 'Senior Mentor', tier: 'gold' },
+          { rank: 3, _id: 'u3', name: 'Sneha Patel', role: 'student', reputationPoints: 95, badge: 'Senior Mentor', tier: 'gold' },
+          { rank: 4, _id: 'u4', name: 'Rohan Verma', role: 'student', reputationPoints: 65, badge: 'Doubt Solver', tier: 'silver' },
+          { rank: 5, _id: 'u5', name: 'Divya Iyer', role: 'student', reputationPoints: 45, badge: 'Doubt Solver', tier: 'silver' },
+        ],
+      });
     }
 
-    res.json(leaderboard);
+    res.json({ success: true, data: leaderboard });
   } catch (err: any) {
-    res.status(500).json({ error: 'Failed to retrieve leaderboard rankings' });
+    res.status(500).json({ success: false, error: { message: 'Failed to retrieve leaderboard rankings' } });
   }
 };
 
@@ -73,7 +77,7 @@ export const getSyllabusCoverage = async (req: Request, res: Response) => {
 
     const subject = await Subject.findById(subjectId).lean();
     if (!subject) {
-      return res.status(404).json({ error: 'Subject not found' });
+      return res.status(404).json({ success: false, error: { message: 'Subject not found' } });
     }
 
     const units = await Unit.find({ subjectId }).lean();
@@ -98,22 +102,25 @@ export const getSyllabusCoverage = async (req: Request, res: Response) => {
     if (!hasSyllabusCopy) gaps.push('Official departmental syllabus PDF unverified');
 
     res.json({
-      subjectId: subject._id,
-      code: subject.code,
-      name: subject.name,
-      totalUnits: units.length || 5,
-      coveragePercentage: Math.min(100, score),
-      verifiedResourcesCount: resources.length,
-      coverageBreakdown: {
-        syllabusCopy: hasSyllabusCopy,
-        lectureNotes: hasNotes,
-        questionPapers: hasPapers,
-        labManuals: hasLabManual,
+      success: true,
+      data: {
+        subjectId: subject._id,
+        code: subject.code,
+        name: subject.name,
+        totalUnits: units.length || 5,
+        coveragePercentage: Math.min(100, score),
+        verifiedResourcesCount: resources.length,
+        coverageBreakdown: {
+          syllabusCopy: hasSyllabusCopy,
+          lectureNotes: hasNotes,
+          questionPapers: hasPapers,
+          labManuals: hasLabManual,
+        },
+        gaps,
       },
-      gaps,
     });
   } catch (err: any) {
-    res.status(500).json({ error: 'Failed to compute syllabus coverage' });
+    res.status(500).json({ success: false, error: { message: 'Failed to compute syllabus coverage' } });
   }
 };
 
@@ -148,17 +155,20 @@ export const getInstitutionalOverview = async (_req: Request, res: Response) => 
     ];
 
     res.json({
-      metrics: {
-        totalSubjects: totalSubjects || 9,
-        verifiedResources: totalResources || 24,
-        vectorChunksIndexed: totalChunks || 482,
-        activeStudyRooms: totalStudyGroups || 6,
-        discussionsResolved: totalDiscussions || 18,
-        retrievalAccuracy: '98.4%',
+      success: true,
+      data: {
+        metrics: {
+          totalSubjects: totalSubjects || 9,
+          verifiedResources: totalResources || 24,
+          vectorChunksIndexed: totalChunks || 482,
+          activeStudyRooms: totalStudyGroups || 6,
+          discussionsResolved: totalDiscussions || 18,
+          retrievalAccuracy: '98.4%',
+        },
+        subjectCoverageList: subjectList,
       },
-      subjectCoverageList: subjectList,
     });
   } catch (err: any) {
-    res.status(500).json({ error: 'Failed to retrieve institutional analytics' });
+    res.status(500).json({ success: false, error: { message: 'Failed to retrieve institutional analytics' } });
   }
 };
