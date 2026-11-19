@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-  PORT: z.coerce.number().int().positive().default(5000),
+  PORT: z.coerce.number().int().positive().default(5001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CLIENT_URL: z.string().default('http://localhost:5173'),
   MONGO_URI: z.string().default('mongodb://localhost:27017/syllabix_db'),
@@ -38,7 +38,7 @@ if (!parsedEnv.success) {
 export const env = parsedEnv.success
   ? parsedEnv.data
   : {
-      PORT: Number(process.env.PORT) || 5000,
+      PORT: Number(process.env.PORT) || 5001,
       NODE_ENV: (process.env.NODE_ENV as any) || 'development',
       CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
       MONGO_URI: process.env.MONGO_URI || 'mongodb://localhost:27017/syllabix_db',

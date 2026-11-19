@@ -55,8 +55,10 @@ app.get('/', (_req, res) => {
 app.use(errorHandler);
 
 // Start HTTP listener and connect to MongoDB
-app.listen(env.PORT, '0.0.0.0', () => {
-  console.log(`[Syllabix Server] Server running on http://127.0.0.1:${env.PORT}`);
+const server = app.listen(env.PORT, '0.0.0.0', () => {
+  const addr = server.address();
+  const actualPort = typeof addr === 'object' && addr ? addr.port : env.PORT;
+  console.log(`[Syllabix Server] Server running on http://127.0.0.1:${actualPort}`);
   console.log(
     `[Syllabix Server] Supabase integration: ${
       isSupabaseConfigured ? env.SUPABASE_URL : 'Offline/mock mode'
@@ -68,6 +70,20 @@ app.listen(env.PORT, '0.0.0.0', () => {
     }`
   );
   connectDB();
+});
+
+server.on('error', (err: NodeJS.ErrnoException) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(
+      `[Syllabix Server Error] Port ${env.PORT} is already in use by another process.\n` +
+      `Tip: You can specify a different port using the PORT environment variable (e.g. PORT=5002 npm run dev), ` +
+      `or terminate the process currently listening on port ${env.PORT}.`
+    );
+    process.exit(1);
+  } else {
+    console.error('[Syllabix Server Error] Unexpected server error:', err);
+    process.exit(1);
+  }
 });
 
 export default app;
