@@ -90,18 +90,21 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 29:** Optimize Context Window & Chunk Selection (COMPLETED - fingerprint deduplication, multi-document source diversity balancing, per-chunk clamping to 1500 chars, and global context budget enforcement)
 - [x] **Phase 8 (Tasks 25–29):** AI Study Assistant Optimization (COMPLETED)
 - [x] **Task 30:** Initialize User Profile on First Login (COMPLETED - auto-bootstrapping on initial auth, explicit sync endpoint, populated academic relations, offline fallback)
-- [ ] **Task 31:** Handle Backend Unavailable in Client API (`client/src/lib/api.ts`)
-- [ ] **Tasks 32–33:** Mentorship Booking Feedback & Notification Badge Counter
+- [x] **Task 31:** Handle Backend Unavailable in Client API (COMPLETED - ApiClientError, isBackendUnavailableError, HTML error page tolerance, 15s timeout, isomorphic env access)
+- [x] **Phase 9 (Tasks 30–31):** User Onboarding & Resilience (COMPLETED)
+- [ ] **Task 32:** Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`)
+- [ ] **Task 33:** Add Notification Badge Counter (`client/src/components/Navbar.tsx`, `client/src/components/NotificationBell.tsx`)
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory Filters
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Client API needs graceful handling and consistent fallback when the backend server is temporarily offline.
+1. Mentorship booking requests need clear visual confirmation and feedback state for the student.
+2. Notification bell needs an unread counter badge synchronized with the backend.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 30: Initialize User Profile on First Login (`server/src/controllers/authController.ts`).
-- **Immediate Next Task:** Task 31: Handle Backend Unavailable in Client API (`client/src/lib/api.ts`).
+- **Current Task:** Completed Task 31: Handle Backend Unavailable in Client API (`client/src/lib/api.ts`).
+- **Immediate Next Task:** Task 32: Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`).
