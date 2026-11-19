@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
 import { Subject } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { MessageSquare, ThumbsUp, CheckCircle2, Plus, Send, Clock, Loader2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, CheckCircle2, Plus, Send, Clock, Loader2, HelpCircle } from 'lucide-react';
 
 interface DiscussionComment {
   _id: string;
@@ -54,6 +54,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
   const [loading, setLoading] = useState(true);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
   const [activeDiscussionId, setActiveDiscussionId] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'resolved' | 'unresolved'>('all');
 
   // Comment input state
   const [commentText, setCommentText] = useState('');
@@ -355,6 +356,20 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
     activeDiscussion?.comments?.some((c) => c.isAcceptedAnswer)
   );
 
+  const resolvedCount = discussions.filter(
+    (d) => d.resolved || d.status === 'resolved' || d.acceptedAnswerId || d.comments?.some((c) => c.isAcceptedAnswer)
+  ).length;
+  const unresolvedCount = discussions.length - resolvedCount;
+
+  const filteredDiscussions = discussions.filter((d) => {
+    const isResolved = Boolean(
+      d.resolved || d.status === 'resolved' || d.acceptedAnswerId || d.comments?.some((c) => c.isAcceptedAnswer)
+    );
+    if (statusFilter === 'resolved') return isResolved;
+    if (statusFilter === 'unresolved') return !isResolved;
+    return true;
+  });
+
   return (
     <div className="w-full max-w-[1440px] mx-auto px-space-4 py-space-4 flex flex-col flex-1 min-h-[calc(100vh-60px)]">
       {/* Page Masthead */}
@@ -398,8 +413,45 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-4 flex-1">
         {/* Left Column: Doubt Feed (5 cols) */}
         <div className="lg:col-span-5 flex flex-col gap-space-2">
-          <div className="text-text-tertiary text-[12px] uppercase font-medium tracking-wider px-1">
-            <span>Course questions ({discussions.length})</span>
+          <div className="flex items-center justify-between px-1">
+            <span className="text-text-tertiary text-[12px] uppercase font-medium tracking-wider">
+              Doubts ({filteredDiscussions.length})
+            </span>
+            <div className="inline-flex items-center gap-1 bg-surface-muted p-0.5 rounded-md border border-border-default text-[11px]">
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`px-2 py-0.5 rounded transition-colors ${
+                  statusFilter === 'all'
+                    ? 'bg-surface-interactive text-text-secondary font-medium'
+                    : 'text-text-tertiary hover:text-text-secondary'
+                }`}
+              >
+                All ({discussions.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('resolved')}
+                className={`px-2 py-0.5 rounded transition-colors ${
+                  statusFilter === 'resolved'
+                    ? 'bg-accent-green/20 text-accent-green font-medium'
+                    : 'text-text-tertiary hover:text-accent-green'
+                }`}
+              >
+                Resolved ({resolvedCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('unresolved')}
+                className={`px-2 py-0.5 rounded transition-colors ${
+                  statusFilter === 'unresolved'
+                    ? 'bg-surface-interactive text-text-secondary font-medium'
+                    : 'text-text-tertiary hover:text-text-secondary'
+                }`}
+              >
+                Open ({unresolvedCount})
+              </button>
+            </div>
           </div>
 
           <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-210px)] pr-1">
@@ -407,13 +459,21 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="h-28 bg-surface-muted border border-border-default rounded-md animate-pulse" />
               ))
-            ) : discussions.length === 0 ? (
+            ) : filteredDiscussions.length === 0 ? (
               <div className="p-6 bg-surface-muted border border-border-default rounded-md text-center text-text-tertiary text-[13px]">
-                No questions found for this course filter.
+                {statusFilter === 'resolved'
+                  ? 'No resolved questions found for this filter.'
+                  : statusFilter === 'unresolved'
+                  ? 'No open questions found. All doubts are currently resolved!'
+                  : 'No questions found for this course filter.'}
               </div>
             ) : (
-              discussions.map((d) => {
+              filteredDiscussions.map((d) => {
                 const isSelected = d._id === activeDiscussionId;
+                const isResolved = Boolean(
+                  d.resolved || d.status === 'resolved' || d.acceptedAnswerId || d.comments?.some((c) => c.isAcceptedAnswer)
+                );
+
                 return (
                   <button
                     key={d._id}
@@ -421,7 +481,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     onClick={() => setActiveDiscussionId(d._id)}
                     className={`w-full text-left p-space-3 rounded-lg border transition-all flex flex-col gap-1.5 ${
                       isSelected
-                        ? 'bg-surface-interactive border-border-interactive shadow-sm'
+                        ? 'bg-surface-interactive border-border-interactive shadow-sm ring-1 ring-border-interactive'
                         : 'bg-surface-muted border-border-default hover:border-border-interactive hover:bg-surface-interactive/40'
                     }`}
                   >
@@ -429,14 +489,15 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                       <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
                         {d.subjectId?.code || 'CS-COURSE'}
                       </span>
-                      {d.resolved || d.status === 'resolved' || d.acceptedAnswerId ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">
-                          <CheckCircle2 className="w-3 h-3 text-text-secondary" />
+                      {isResolved ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
+                          <CheckCircle2 className="w-3 h-3 text-accent-green" />
                           <span>Resolved</span>
                         </span>
                       ) : (
-                        <span className="text-[11px] text-text-tertiary">
-                          {d.comments?.length || 0} answers
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary bg-surface-base border border-border-default px-2 py-0.5 rounded-full">
+                          <HelpCircle className="w-3 h-3 text-text-tertiary" />
+                          <span>Open ({d.comments?.length || d.commentCount || 0})</span>
                         </span>
                       )}
                     </div>
@@ -470,9 +531,22 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
               {/* Question Header */}
               <div className="p-space-4 border-b border-border-default bg-surface-base space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-interactive px-2 py-0.5 rounded border border-border-default">
-                    {activeDiscussion.subjectId?.code} — {activeDiscussion.subjectId?.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-interactive px-2 py-0.5 rounded border border-border-default">
+                      {activeDiscussion.subjectId?.code} — {activeDiscussion.subjectId?.name}
+                    </span>
+                    {hasAcceptedAnswer ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
+                        <CheckCircle2 className="w-3 h-3 text-accent-green" />
+                        <span>Resolved</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary bg-surface-muted border border-border-default px-2 py-0.5 rounded-full">
+                        <HelpCircle className="w-3 h-3 text-text-tertiary" />
+                        <span>Open Doubt</span>
+                      </span>
+                    )}
+                  </div>
                   <span className="text-[11px] text-text-tertiary flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     <span>{new Date(activeDiscussion.createdAt).toLocaleDateString()}</span>
@@ -505,7 +579,27 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     <span>Community solutions ({activeDiscussion.comments?.length || 0})</span>
                     {commentsLoading && <Loader2 className="w-3 h-3 animate-spin text-text-tertiary" />}
                   </span>
+                  {hasAcceptedAnswer && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-green">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-accent-green" />
+                      <span>Has accepted solution</span>
+                    </span>
+                  )}
                 </div>
+
+                {hasAcceptedAnswer && (
+                  <div className="p-3 bg-accent-green/10 border border-accent-green/30 rounded-lg flex items-center justify-between gap-3 text-[13px]">
+                    <div className="flex items-center gap-2 text-text-secondary">
+                      <CheckCircle2 className="w-4 h-4 text-accent-green flex-shrink-0" />
+                      <span>
+                        <strong>Accepted Solution Available</strong> — The author verified the solution highlighted below.
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2 py-0.5 rounded-full">
+                      +15 Rep
+                    </span>
+                  </div>
+                )}
 
                 {acceptError && (
                   <div className="p-2 text-[12px] text-status-error bg-status-errorSurface border border-status-error rounded-md flex items-center justify-between">
@@ -538,9 +632,9 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     return (
                       <div
                         key={comment._id}
-                        className={`p-space-3 rounded-lg border space-y-2 ${
+                        className={`p-space-3 rounded-lg border space-y-2 transition-all ${
                           comment.isAcceptedAnswer
-                            ? 'bg-surface-interactive border-border-interactive shadow-sm'
+                            ? 'bg-surface-interactive border-border-interactive shadow-sm ring-1 ring-accent-green/40'
                             : 'bg-surface-muted border-border-default'
                         }`}
                       >
@@ -559,9 +653,9 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                             )}
                           </div>
                           {comment.isAcceptedAnswer ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-secondary bg-surface-base border border-border-interactive px-2 py-0.5 rounded-full">
-                              <CheckCircle2 className="w-3 h-3 text-text-secondary" />
-                              <span>Accepted answer (+15 pts)</span>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2.5 py-0.5 rounded-full shadow-sm">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-accent-green" />
+                              <span>Accepted Solution (+15 pts)</span>
                             </span>
                           ) : isDiscussionAuthor && !hasAcceptedAnswer && !isCommentAuthor ? (
                             <button
