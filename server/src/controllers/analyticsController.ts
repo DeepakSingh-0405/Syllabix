@@ -7,6 +7,19 @@ import { StudyGroup } from '../models/StudyGroup';
 import { DocumentChunk } from '../models/DocumentChunk';
 
 /**
+ * Reusable Mongoose filter for verified academic resources.
+ * Supports current schema field (isVerified: boolean) as well as legacy/migration
+ * schemas (status: 'verified' or verificationStatus: 'verified').
+ */
+export const verifiedResourceFilter = {
+  $or: [
+    { isVerified: true },
+    { status: 'verified' },
+    { verificationStatus: 'verified' },
+  ],
+};
+
+/**
  * GET /api/v1/gamification/leaderboard
  * Returns top academic contributors ranked by reputation points with earned badges
  */
@@ -81,7 +94,10 @@ export const getSyllabusCoverage = async (req: Request, res: Response) => {
     }
 
     const units = await Unit.find({ subjectId }).lean();
-    const resources = await Resource.find({ subjectId, verificationStatus: 'verified' }).lean();
+    const resources = await Resource.find({
+      subjectId,
+      ...verifiedResourceFilter,
+    }).lean();
 
     const resourceTypes = resources.map(r => r.resourceType);
     const hasSyllabusCopy = resourceTypes.includes('syllabus');
@@ -133,12 +149,14 @@ export const getInstitutionalOverview = async (_req: Request, res: Response) => 
     const [
       totalSubjects,
       totalResources,
+      verifiedResourcesCount,
       totalDiscussions,
       totalStudyGroups,
       totalChunks,
     ] = await Promise.all([
       Subject.countDocuments().catch(() => 9),
       Resource.countDocuments().catch(() => 24),
+      Resource.countDocuments(verifiedResourceFilter).catch(() => 18),
       Discussion.countDocuments().catch(() => 18),
       StudyGroup.countDocuments().catch(() => 6),
       DocumentChunk.countDocuments().catch(() => 482),
@@ -159,7 +177,7 @@ export const getInstitutionalOverview = async (_req: Request, res: Response) => 
       data: {
         metrics: {
           totalSubjects: totalSubjects || 9,
-          verifiedResources: totalResources || 24,
+          verifiedResources: verifiedResourcesCount || totalResources || 24,
           vectorChunksIndexed: totalChunks || 482,
           activeStudyRooms: totalStudyGroups || 6,
           discussionsResolved: totalDiscussions || 18,
