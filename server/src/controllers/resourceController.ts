@@ -5,6 +5,7 @@ import { Resource } from '../models/Resource';
 import { Subject, Branch } from '../models/Academic';
 import { supabaseAdmin, BUCKETS } from '../config/supabase';
 import { env } from '../config/env';
+import { escapeRegex } from '../utils/sanitize';
 
 import { processDocumentIngestion } from '../services/ingestionWorker';
 
@@ -17,9 +18,10 @@ export const getResources = async (req: Request, res: Response): Promise<void> =
     if (subjectId) filter.subjectId = subjectId;
     if (resourceType) filter.resourceType = resourceType;
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       filter.$or = [
-        { title: { $regex: String(search), $options: 'i' } },
-        { description: { $regex: String(search), $options: 'i' } },
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -92,11 +94,13 @@ export const requestUploadIntent = async (req: AuthenticatedRequest, res: Respon
       const queryName = subjectName || title;
       const queryCode = (subjectCode || queryName.slice(0, 6).toUpperCase().replace(/[^A-Z0-9]/g, '')) || 'ACAD';
 
-      // Search if a subject already exists matching the entered code or name
+      // Search if a subject already exists matching the entered code or name (safely escaped)
+      const safeCode = escapeRegex(queryCode);
+      const safeName = escapeRegex(queryName);
       targetSubject = await Subject.findOne({
         $or: [
-          { code: new RegExp(`^${queryCode}$`, 'i') },
-          { name: new RegExp(`^${queryName}$`, 'i') },
+          { code: new RegExp(`^${safeCode}$`, 'i') },
+          { name: new RegExp(`^${safeName}$`, 'i') },
         ],
       });
 

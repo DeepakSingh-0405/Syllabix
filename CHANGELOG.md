@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Security
+- Sanitized search regular expressions in `server/src/utils/sanitize.ts`, `server/src/controllers/academicController.ts`, `server/src/controllers/resourceController.ts`, and `server/src/controllers/aiController.ts`: safely escaped regex metacharacters in search queries and subject lookup filters to protect against ReDoS and query injection vulnerabilities.
 - Prevented reputation manipulation in `server/src/controllers/discussionController.ts` and `server/src/routes/index.ts`: bound `verifySupabaseToken` and payload validation to answer acceptance, verified question author ownership, blocked multiple/duplicate answer acceptances, prevented self-acceptance reputation farming, and dispatched in-app peer notifications.
 - Enforced flashcard review ownership in `server/src/controllers/aiController.ts` and `server/src/routes/index.ts`: bound `verifySupabaseToken` to review submission endpoint, validated that reviewing user owns the associated flashcard deck or is an administrator, and rejected unauthorized attempts with 403 Forbidden.
 - Enforced document access permissions in `server/src/controllers/resourceController.ts` and `server/src/routes/index.ts`: added `isPrivate` attribute to Resource schema, allowed public downloads without auth while strictly requiring ownership or admin privileges for private downloads, and required authentication and ownership verification for upload confirmations.

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Institution, Program, Branch, Subject, Unit, Topic } from '../models/Academic';
+import { escapeRegex } from '../utils/sanitize';
 
 export const getInstitutions = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -28,9 +29,10 @@ export const getSubjects = async (req: Request, res: Response): Promise<void> =>
     if (semester) filter.semester = Number(semester);
     if (branchId) filter.branchId = branchId;
     if (search) {
+      const safeSearch = escapeRegex(String(search));
       filter.$or = [
-        { name: { $regex: String(search), $options: 'i' } },
-        { code: { $regex: String(search), $options: 'i' } },
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { code: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 

@@ -8,6 +8,7 @@ import { FlashcardDeck, Flashcard } from '../models/Flashcard';
 import { geminiService } from '../services/geminiService';
 import { cacheService } from '../services/redisService';
 import { getCurriculumBySubject, getCurriculumContext } from '../data/curriculumData';
+import { escapeRegex } from '../utils/sanitize';
 
 /**
  * Helper to gather rich textual context from uploaded documents, chunks, and curriculum knowledge base.
@@ -49,8 +50,9 @@ async function gatherSubjectContext(
     }
     if (!subject) {
       try {
+        const safeSubjectId = escapeRegex(subjectId);
         subject = await Subject.findOne({
-          $or: [{ code: subjectId.toUpperCase() }, { name: new RegExp(subjectId, 'i') }],
+          $or: [{ code: subjectId.toUpperCase() }, { name: new RegExp(safeSubjectId, 'i') }],
         }).lean();
       } catch (err) {
         console.warn('[AIController] Error finding subject by code/name:', err);
