@@ -95,18 +95,17 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 32:** Provide Booking Confirmation Feedback (COMPLETED - rich confirmation card, live chat action, duplicate submission prevention, dismissible error banner)
 - [x] **Task 33:** Add Notification Badge Counter (COMPLETED - reactive numerical badge with 9+ cap, dynamic aria-label, item mark-as-read, click-outside dismissal)
 - [x] **Task 34:** Implement SM-2 Review Interval Scheduling (COMPLETED - pure calculateSM2Review, falsy 0 fix, EF >= 1.3 floor, exact progression math, due date scheduling)
-- [ ] **Task 35:** Add Semester and Branch Filters (`client/src/pages/SubjectDirectoryPage.tsx`)
-- [ ] **Task 36:** Link Upload Modal from Subject Page (`client/src/pages/SubjectDirectoryPage.tsx`)
+- [x] **Task 35:** Add Semester and Branch Filters (COMPLETED - multi-dimensional branch/semester filtering, dynamic subject pill scoping, active filter badges, clear controls)
+- [ ] **Task 36:** Link Upload Modal from Subject Page (`client/src/components/SyllabusCard.tsx`, `client/src/components/DetailsDrawer.tsx`)
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Subject Directory needs semester and branch filtering controls to narrow down curriculum courses.
-2. Subject Directory needs quick-action upload modal triggers.
+1. Subject Directory cards and DetailsDrawer need direct "Upload Syllabus / Contribute Document" triggers pre-selecting the active subject.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 34: Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`).
-- **Immediate Next Task:** Task 35: Add Semester and Branch Filters (`client/src/pages/SubjectDirectoryPage.tsx`).
+- **Current Task:** Completed Task 35: Add Semester and Branch Filters (`client/src/pages/DirectoryPage.tsx`).
+- **Immediate Next Task:** Task 36: Link Upload Modal from Subject Page (`client/src/components/SyllabusCard.tsx`, `client/src/components/DetailsDrawer.tsx`).

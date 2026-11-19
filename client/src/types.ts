@@ -19,6 +19,7 @@ export interface Subject {
   credits: number;
   isCore: boolean;
   topicCount: number;
+  branch?: string;
 }
 
 export type ResourceType = 'syllabus' | 'lecture_notes' | 'question_paper' | 'lab_manual' | 'reference_book';
