@@ -49,7 +49,16 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [bookingMessage, setBookingMessage] = useState('');
   const [bookingSubjectId, setBookingSubjectId] = useState(subjects[0]?._id || '');
-  const [bookingStatus, setBookingStatus] = useState<string | null>(null);
+  const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [confirmedBooking, setConfirmedBooking] = useState<{
+    mentorName: string;
+    subjectCode: string;
+    subjectName: string;
+    message: string;
+    availability: string;
+    timestamp: string;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchMentors = async () => {
@@ -180,27 +189,59 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
     }, 1200);
   };
 
-  // Submit Session Booking
+  // Submit Session Booking with feedback & error handling
   const handleBookSession = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bookingMessage.trim()) return;
+    if (!bookingMessage.trim() || isBookingSubmitting) return;
 
     const activeMentor = mentors.find((m) => m._id === selectedMentorId);
     if (!activeMentor) return;
 
+    const effectiveSubject = subjects.find((s) => s._id === bookingSubjectId) || subjects[0] || {
+      _id: 'sub_default',
+      code: 'CS-GEN',
+      name: 'General Academic Guidance',
+    };
+
+    setIsBookingSubmitting(true);
+    setBookingError(null);
+
     try {
       await api.post('/mentors/request', {
         mentorUserId: activeMentor.userId._id,
-        subjectId: bookingSubjectId || subjects[0]?._id,
+        subjectId: effectiveSubject._id,
         message: bookingMessage.trim(),
       });
-      setBookingStatus('Session requested successfully! The mentor has received your booking notice.');
-    } catch {
-      setBookingStatus('Session requested successfully! The mentor has received your booking notice.');
-    }
 
-    setBookingMessage('');
-    setTimeout(() => setBookingStatus(null), 5000);
+      setConfirmedBooking({
+        mentorName: activeMentor.userId?.name || 'Verified Mentor',
+        subjectCode: effectiveSubject.code,
+        subjectName: effectiveSubject.name,
+        message: bookingMessage.trim(),
+        availability: activeMentor.availability,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      setBookingMessage('');
+    } catch (err: any) {
+      console.warn('[MentorshipPage] Booking session request failed:', err);
+      const isOffline = api.isBackendUnavailable(err);
+      if (isOffline) {
+        // In local demo or offline mode, simulate successful confirmation
+        setConfirmedBooking({
+          mentorName: activeMentor.userId?.name || 'Verified Mentor',
+          subjectCode: effectiveSubject.code,
+          subjectName: effectiveSubject.name,
+          message: bookingMessage.trim(),
+          availability: activeMentor.availability,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
+        setBookingMessage('');
+      } else {
+        setBookingError(err?.message || 'Failed to submit mentorship booking request. Please try again.');
+      }
+    } finally {
+      setIsBookingSubmitting(false);
+    }
   };
 
   const selectedMentor = mentors.find((m) => m._id === selectedMentorId) || mentors[0];
@@ -401,10 +442,10 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                 /* View 2: Book Guidance Session */
                 <div className="flex-1 overflow-y-auto p-space-4 space-y-space-4 bg-surface-base/40">
                   <div className="p-4 bg-surface-base border border-border-default rounded-md space-y-2">
-                    <h3 className="text-[15px] font-semibold text-text-secondary">
+                    <h3 className="text-[16px] font-semibold text-text-secondary">
                       Session Details with {selectedMentor.userId?.name}
                     </h3>
-                    <p className="text-[13px] text-text-tertiary leading-relaxed">
+                    <p className="text-[14px] text-text-tertiary leading-relaxed">
                       {selectedMentor.bio}
                     </p>
                     <div className="pt-2 flex flex-wrap gap-2">
@@ -417,55 +458,121 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                     </div>
                   </div>
 
-                  {bookingStatus && (
-                    <div className="p-3 bg-surface-interactive border border-border-interactive text-text-secondary text-[13px] rounded-md flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-text-secondary shrink-0" />
-                      <span>{bookingStatus}</span>
+                  {/* Confirmed Booking Feedback Card */}
+                  {confirmedBooking ? (
+                    <div className="p-5 bg-surface-base border border-border-interactive rounded-lg shadow-sm space-y-4 animate-in fade-in duration-300">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-surface-interactive border border-border-interactive rounded-full shrink-0 mt-0.5">
+                          <CheckCircle2 className="w-5 h-5 text-text-secondary" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="text-[16px] font-semibold text-text-secondary">
+                            Session Request Confirmed
+                          </h4>
+                          <p className="text-[12px] text-text-tertiary">
+                            Your guidance request was dispatched to {confirmedBooking.mentorName} at {confirmedBooking.timestamp}.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-surface-muted p-3.5 rounded-md border border-border-default space-y-2 text-[12px]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-text-tertiary">Subject:</span>
+                          <span className="font-semibold text-text-secondary font-mono">{confirmedBooking.subjectCode} — {confirmedBooking.subjectName}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-text-tertiary">Mentor Availability:</span>
+                          <span className="text-text-secondary">{confirmedBooking.availability}</span>
+                        </div>
+                        <div className="pt-1.5 border-t border-border-default/60">
+                          <span className="text-text-tertiary block mb-1">Doubt / Topic Covered:</span>
+                          <p className="text-text-secondary italic line-clamp-2">
+                            "{confirmedBooking.message}"
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmedBooking(null)}
+                          className="px-3 py-1.5 rounded-md text-[12px] font-medium text-text-tertiary hover:text-text-secondary border border-border-default bg-surface-muted hover:bg-surface-interactive transition-colors"
+                        >
+                          Book Another Session
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('chat');
+                            setConfirmedBooking(null);
+                          }}
+                          className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[12px] px-4 py-1.5 rounded-md hover:opacity-90 transition-all shadow-sm"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Open 1-on-1 Live Chat</span>
+                        </button>
+                      </div>
                     </div>
+                  ) : (
+                    <>
+                      {bookingError && (
+                        <div className="p-3 bg-surface-muted border border-border-interactive text-text-secondary text-[12px] rounded-md flex items-center justify-between gap-2">
+                          <span>{bookingError}</span>
+                          <button
+                            type="button"
+                            onClick={() => setBookingError(null)}
+                            className="text-text-tertiary hover:text-text-secondary text-[11px] underline"
+                          >
+                            Dismiss
+                          </button>
+                        </div>
+                      )}
+
+                      <form onSubmit={handleBookSession} className="space-y-space-3 bg-surface-base p-4 border border-border-default rounded-md">
+                        <div>
+                          <label className="block text-[12px] font-medium text-text-tertiary mb-1">
+                            Select subject
+                          </label>
+                          <select
+                            value={bookingSubjectId}
+                            onChange={(e) => setBookingSubjectId(e.target.value)}
+                            className="w-full bg-surface-muted text-text-secondary text-[12px] px-3 py-2 rounded border border-border-interactive focus-visible:ring-2"
+                          >
+                            {subjects.map((s) => (
+                              <option key={s._id} value={s._id}>
+                                {s.code} — {s.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[12px] font-medium text-text-tertiary mb-1">
+                            Specific exam doubt or syllabus topic
+                          </label>
+                          <textarea
+                            required
+                            rows={3}
+                            value={bookingMessage}
+                            onChange={(e) => setBookingMessage(e.target.value)}
+                            placeholder="e.g. Need clarification on Unit 3 Dynamic Programming state transitions and previous mid-sem exam problems..."
+                            className="w-full bg-surface-muted text-text-secondary text-[12px] px-3 py-2 rounded border border-border-interactive focus-visible:ring-2 resize-none"
+                          />
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                          <button
+                            type="submit"
+                            disabled={isBookingSubmitting || !bookingMessage.trim()}
+                            className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[12px] px-4 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{isBookingSubmitting ? 'Submitting Request...' : 'Confirm session booking'}</span>
+                          </button>
+                        </div>
+                      </form>
+                    </>
                   )}
-
-                  <form onSubmit={handleBookSession} className="space-y-space-3 bg-surface-base p-4 border border-border-default rounded-md">
-                    <div>
-                      <label className="block text-[12px] font-medium text-text-tertiary mb-1">
-                        Select subject
-                      </label>
-                      <select
-                        value={bookingSubjectId}
-                        onChange={(e) => setBookingSubjectId(e.target.value)}
-                        className="w-full bg-surface-muted text-text-secondary text-[13px] px-3 py-2 rounded border border-border-interactive focus-visible:ring-2"
-                      >
-                        {subjects.map((s) => (
-                          <option key={s._id} value={s._id}>
-                            {s.code} — {s.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[12px] font-medium text-text-tertiary mb-1">
-                        Specific exam doubt or syllabus topic
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={bookingMessage}
-                        onChange={(e) => setBookingMessage(e.target.value)}
-                        placeholder="e.g. Need clarification on Unit 3 Dynamic Programming state transitions and previous mid-sem exam problems..."
-                        className="w-full bg-surface-muted text-text-secondary text-[13px] px-3 py-2 rounded border border-border-interactive focus-visible:ring-2 resize-none"
-                      />
-                    </div>
-
-                    <div className="flex justify-end pt-2">
-                      <button
-                        type="submit"
-                        className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-4 py-2 rounded-md hover:opacity-90 transition-all"
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>Confirm session booking</span>
-                      </button>
-                    </div>
-                  </form>
                 </div>
               )}
             </>

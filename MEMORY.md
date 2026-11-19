@@ -92,7 +92,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 30:** Initialize User Profile on First Login (COMPLETED - auto-bootstrapping on initial auth, explicit sync endpoint, populated academic relations, offline fallback)
 - [x] **Task 31:** Handle Backend Unavailable in Client API (COMPLETED - ApiClientError, isBackendUnavailableError, HTML error page tolerance, 15s timeout, isomorphic env access)
 - [x] **Phase 9 (Tasks 30–31):** User Onboarding & Resilience (COMPLETED)
-- [ ] **Task 32:** Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`)
+- [x] **Task 32:** Provide Booking Confirmation Feedback (COMPLETED - rich confirmation card, live chat action, duplicate submission prevention, dismissible error banner)
 - [ ] **Task 33:** Add Notification Badge Counter (`client/src/components/Navbar.tsx`, `client/src/components/NotificationBell.tsx`)
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory Filters
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
@@ -100,11 +100,10 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Mentorship booking requests need clear visual confirmation and feedback state for the student.
-2. Notification bell needs an unread counter badge synchronized with the backend.
+1. Notification bell needs an unread counter badge synchronized with the backend.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 31: Handle Backend Unavailable in Client API (`client/src/lib/api.ts`).
-- **Immediate Next Task:** Task 32: Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`).
+- **Current Task:** Completed Task 32: Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`).
+- **Immediate Next Task:** Task 33: Add Notification Badge Counter (`client/src/components/Navbar.tsx`, `client/src/components/NotificationBell.tsx`).
