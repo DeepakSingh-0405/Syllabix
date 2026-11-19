@@ -19,6 +19,57 @@ export function getActiveEmbeddingModel(): string {
   return process.env.GEMINI_EMBEDDING_MODEL || env.GEMINI_EMBEDDING_MODEL || GEMINI_CONFIG.EMBEDDING_MODEL;
 }
 
+/**
+ * Standardized error class for Gemini API exceptions, rate limits, and quota restrictions.
+ */
+export class GeminiApiError extends Error {
+  public statusCode: number;
+  public errorCode: string;
+  public isRateLimit: boolean;
+  public isQuotaExceeded: boolean;
+
+  constructor(message: string, statusCode = 500, errorCode = 'AI_SERVICE_ERROR') {
+    super(message);
+    this.name = 'GeminiApiError';
+    this.statusCode = statusCode;
+    this.errorCode = errorCode;
+    this.isRateLimit = statusCode === 429;
+    this.isQuotaExceeded = statusCode === 429 || statusCode === 403;
+  }
+}
+
+/**
+ * Normalizes HTTP error responses from Google Gemini API into standardized GeminiApiError instances.
+ */
+export function parseGeminiError(status: number, rawError?: any): GeminiApiError {
+  if (status === 429) {
+    return new GeminiApiError(
+      'Gemini API rate limit exceeded. Falling back to deterministic curriculum knowledge base.',
+      429,
+      'RATE_LIMIT_EXCEEDED'
+    );
+  }
+  if (status === 403) {
+    return new GeminiApiError(
+      'Gemini API quota exhausted or access forbidden. Falling back to deterministic curriculum knowledge base.',
+      403,
+      'QUOTA_EXHAUSTED'
+    );
+  }
+  if (status === 503 || status === 502 || status === 504) {
+    return new GeminiApiError(
+      'Gemini API upstream service temporarily unavailable. Falling back to deterministic curriculum knowledge base.',
+      status,
+      'UPSTREAM_SERVICE_UNAVAILABLE'
+    );
+  }
+  return new GeminiApiError(
+    rawError?.message || `Gemini API returned status ${status}. Falling back to curriculum synthesis.`,
+    status,
+    'AI_GENERATION_FAILED'
+  );
+}
+
 export interface GroundedRAGResult {
   answer: string;
   citedChunks: {
@@ -117,9 +168,17 @@ export class GeminiService {
         if (text) {
           return { text, model: modelName };
         }
+      } else {
+        const errPayload = await response.json().catch(() => ({}));
+        const parsedErr = parseGeminiError(response.status, errPayload?.error);
+        console.warn(`[GeminiService] HTTP ${response.status}: ${parsedErr.message}`);
       }
-    } catch (err) {
-      console.warn(`[GeminiService] Error calling ${modelName}:`, err);
+    } catch (err: any) {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+        console.warn(`[GeminiService] Request timeout (${timeoutMs}ms) for ${modelName}. Falling back to curriculum synthesis.`);
+      } else {
+        console.warn(`[GeminiService] Network/Transport error calling ${modelName}:`, err?.message || err);
+      }
     }
     return null;
   }
@@ -148,13 +207,19 @@ export class GeminiService {
           }
         );
 
-        const data = await response.json();
-        const values = data.embedding?.values;
-        if (Array.isArray(values) && values.length > 0) {
-          return values.slice(0, 768);
+        if (response.ok) {
+          const data = await response.json();
+          const values = data.embedding?.values;
+          if (Array.isArray(values) && values.length > 0) {
+            return values.slice(0, 768);
+          }
+        } else {
+          const errPayload = await response.json().catch(() => ({}));
+          const parsedErr = parseGeminiError(response.status, errPayload?.error);
+          console.warn(`[GeminiService] Embedding HTTP ${response.status}: ${parsedErr.message}`);
         }
-      } catch (err) {
-        console.warn(`[GeminiService] Error calling ${embeddingModel}, using deterministic vector:`, err);
+      } catch (err: any) {
+        console.warn(`[GeminiService] Error calling ${embeddingModel}, using deterministic vector:`, err?.message || err);
       }
     }
 
