@@ -57,7 +57,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 02:** Normalize API Response Contract (COMPLETED - leaderboard & analytics responses standardized)
 - [x] **Task 03:** Fix Demo Authentication Session Handling in `api.ts` (COMPLETED - demo session resolution & write guard)
 - [x] **Task 04:** Fix Demo Token Security (COMPLETED - strict production restriction & exact token whitelist)
-- [ ] **Task 05:** Fix Mentorship Chat Authorization
+- [x] **Task 05:** Fix Mentorship Chat Authorization (COMPLETED - participant ownership & 401/403 validation)
+- [ ] **Task 06:** Fix Private Document Access
 - [ ] **Task 03:** Fix Demo Authentication Session Handling
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
@@ -81,5 +82,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 04: Fix Demo Token Security.
-- **Immediate Next Task:** Task 05: Fix Mentorship Chat Authorization in `server/src/controllers/mentorshipController.ts`.
+- **Current Task:** Completed Task 05: Fix Mentorship Chat Authorization.
+- **Immediate Next Task:** Task 06: Fix Private Document Access in `server/src/controllers/resourceController.ts`.

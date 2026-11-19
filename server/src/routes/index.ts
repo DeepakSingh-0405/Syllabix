@@ -175,7 +175,7 @@ router.post('/study-groups/:id/messages', optionalSupabaseToken, studyGroupContr
 router.get('/mentors', mentorshipController.getMentors);
 router.post(
   '/mentors/request',
-  optionalSupabaseToken,
+  verifySupabaseToken,
   validate(
     z.object({
       mentorUserId: z.string(),
@@ -186,10 +186,10 @@ router.post(
   ),
   mentorshipController.requestMentorship
 );
-router.get('/mentors/my-requests', optionalSupabaseToken, mentorshipController.getMyRequests);
-router.patch('/mentors/requests/:id', optionalSupabaseToken, mentorshipController.updateRequestStatus);
-router.get('/mentors/requests/:id/messages', optionalSupabaseToken, mentorshipController.getMentorshipMessages);
-router.post('/mentors/requests/:id/messages', optionalSupabaseToken, mentorshipController.postMentorshipMessage);
+router.get('/mentors/my-requests', verifySupabaseToken, mentorshipController.getMyRequests);
+router.patch('/mentors/requests/:id', verifySupabaseToken, mentorshipController.updateRequestStatus);
+router.get('/mentors/requests/:id/messages', verifySupabaseToken, mentorshipController.getMentorshipMessages);
+router.post('/mentors/requests/:id/messages', verifySupabaseToken, mentorshipController.postMentorshipMessage);
 
 // Realtime User Notifications
 router.get('/notifications', verifySupabaseToken, notificationController.getNotifications);

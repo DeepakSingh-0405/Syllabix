@@ -162,12 +162,34 @@ export const updateRequestStatus = async (req: AuthenticatedRequest, res: Respon
 
 export const getMentorshipMessages = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to access mentorship messages.' },
+      });
+      return;
+    }
+
     const { id } = req.params;
-    const request = await MentorshipRequest.findById(id).select('messages status scheduledAt message');
+    const request = await MentorshipRequest.findById(id).select('messages status scheduledAt message studentId mentorId');
     if (!request) {
       res.status(404).json({ success: false, error: { message: 'Mentorship session not found' } });
       return;
     }
+
+    const currentUserId = String(req.user._id);
+    const isParticipant =
+      String(request.studentId) === currentUserId ||
+      String(request.mentorId) === currentUserId;
+
+    if (!isParticipant) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Access denied. You are not an authorized participant in this mentorship session.' },
+      });
+      return;
+    }
+
     res.json({ success: true, data: request.messages || [] });
   } catch (err: any) {
     res.status(500).json({ success: false, error: { message: err.message } });
@@ -176,6 +198,14 @@ export const getMentorshipMessages = async (req: AuthenticatedRequest, res: Resp
 
 export const postMentorshipMessage = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required to send mentorship messages.' },
+      });
+      return;
+    }
+
     const { id } = req.params;
     const { text } = req.body;
 
@@ -190,8 +220,29 @@ export const postMentorshipMessage = async (req: AuthenticatedRequest, res: Resp
       return;
     }
 
-    const senderName = req.user?.name || req.supabaseUser?.email?.split('@')[0] || 'Scholar';
-    const senderId = req.user?._id?.toString() || req.supabaseUser?.id || 'anon-scholar';
+    const currentUserId = String(req.user._id);
+    const isParticipant =
+      String(request.studentId) === currentUserId ||
+      String(request.mentorId) === currentUserId;
+
+    if (!isParticipant) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Access denied. Only authorized participants can send messages in this session.' },
+      });
+      return;
+    }
+
+    if (request.status === 'declined') {
+      res.status(400).json({
+        success: false,
+        error: { message: 'Cannot send messages to a declined mentorship session.' },
+      });
+      return;
+    }
+
+    const senderName = req.user.name || req.supabaseUser?.email?.split('@')[0] || 'Scholar';
+    const senderId = currentUserId;
 
     const newMessage = {
       senderId,

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Security
+- Protected mentorship conversations in `server/src/controllers/mentorshipController.ts` and `server/src/routes/index.ts`: enforced strict student/mentor participant validation on message reads and writes, returning 401/403 for unauthorized access.
 - Restricted demo authentication in `server/src/middleware/auth.ts`: enforced strict production rejection regardless of environment overrides and eliminated arbitrary prefix bypasses with exact token whitelisting.
 
 ### Fixed
