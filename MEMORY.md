@@ -81,8 +81,13 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 21:** Ensure Idempotent Database Seed (COMPLETED - unique-key check, centralized seedDatabase, zero duplicate insertions)
 - [x] **Task 22:** Assign Study Group Owner Correctly (COMPLETED - bound ownerId to authenticated req.user._id and added to memberIds)
 - [x] **Task 23:** Handle Mongo Disconnect Gracefully (COMPLETED - lifecycle listeners, reconnect scheduling, zero unhandled errors)
-- [ ] **Task 24:** Expand Health Check Status (`server/src/routes/index.ts`)
-- [ ] **Tasks 25–29:** AI Study Assistant Optimization
+- [x] **Task 24:** Expand Health Check Status (COMPLETED - deep checks for MongoDB, Supabase, Gemini, uptime, degraded state)
+- [x] **Phase 7 (Tasks 21–24):** Database & Backend Reliability (COMPLETED)
+- [ ] **Task 25:** Enforce Model Configuration (`server/src/services/geminiService.ts`)
+- [ ] **Task 26:** Normalize Gemini API Error Handling (`server/src/services/geminiService.ts`)
+- [ ] **Task 27:** Handle Empty Document Extraction Gracefully (`server/src/services/documentParser.ts`)
+- [ ] **Task 28:** Ensure Deterministic AI Synthesis Fallback (`server/src/services/geminiService.ts`)
+- [ ] **Task 29:** Optimize Context Window & Chunk Selection (`server/src/services/geminiService.ts`)
 - [ ] **Tasks 30–33:** Auth Context & Frontend Fallback Stabilization
 - [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
@@ -90,11 +95,11 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Health check route `/api/health` needs deep status checking for MongoDB, Supabase, and Gemini AI.
-2. AI Assistant parameters and prompt limits need fine-tuning and strict schema enforcement.
+1. Gemini AI generation and embedding calls need strict model configuration and error normalization.
+2. Chunk selection needs context-window budget management for large document corpora.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 23: Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`).
-- **Immediate Next Task:** Task 24: Expand Health Check Status (`server/src/routes/index.ts`).
+- **Current Task:** Completed Task 24: Expand Health Check Status (`server/src/routes/index.ts`).
+- **Immediate Next Task:** Task 25: Enforce Model Configuration (`server/src/services/geminiService.ts`).

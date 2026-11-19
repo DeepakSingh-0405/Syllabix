@@ -11,16 +11,43 @@ import * as studyGroupController from '../controllers/studyGroupController';
 import * as mentorshipController from '../controllers/mentorshipController';
 import * as notificationController from '../controllers/notificationController';
 import * as analyticsController from '../controllers/analyticsController';
+import { isDatabaseConnected, getConnectionState } from '../config/database';
+import { env, isSupabaseConfigured, isGeminiConfigured } from '../config/env';
 
 const router = Router();
 
 // Health check
 router.get('/health', (_req, res) => {
+  const dbConnected = isDatabaseConnected();
+  const dbState = getConnectionState();
+  const supabaseOk = isSupabaseConfigured;
+  const geminiOk = isGeminiConfigured;
+
+  // Status is healthy when all primary services are online; degraded when running on resilient fallbacks
+  const status: 'healthy' | 'degraded' = dbConnected && supabaseOk ? 'healthy' : 'degraded';
+
   res.json({
-    status: 'healthy',
+    status,
     timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
     service: 'Syllabix MERN Backend API',
-    supabaseConnected: true,
+    environment: env.NODE_ENV,
+    checks: {
+      database: {
+        status: dbState,
+        connected: dbConnected,
+      },
+      supabase: {
+        configured: supabaseOk,
+        status: supabaseOk ? 'connected' : 'mock_mode',
+      },
+      gemini: {
+        configured: geminiOk,
+        status: geminiOk ? 'live_api' : 'deterministic_synthesis',
+      },
+    },
+    // Backward compatibility for legacy monitoring
+    supabaseConnected: supabaseOk,
   });
 });
 
