@@ -151,7 +151,16 @@ router.post(
   ),
   discussionController.addComment
 );
-router.patch('/discussions/:id/accept-answer', optionalSupabaseToken, discussionController.acceptAnswer);
+router.patch(
+  '/discussions/:id/accept-answer',
+  verifySupabaseToken,
+  validate(
+    z.object({
+      commentId: z.string().min(1),
+    })
+  ),
+  discussionController.acceptAnswer
+);
 
 // Collaborative Study Groups & Realtime Circles
 router.get('/study-groups', studyGroupController.getStudyGroups);

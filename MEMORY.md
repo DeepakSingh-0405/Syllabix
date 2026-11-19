@@ -60,7 +60,8 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 05:** Fix Mentorship Chat Authorization (COMPLETED - participant ownership & 401/403 validation)
 - [x] **Task 06:** Fix Private Document Access (COMPLETED - private document ownership/admin enforcement & public download access)
 - [x] **Task 07:** Fix Flashcard Permissions (COMPLETED - flashcard review ownership enforcement)
-- [ ] **Task 08:** Prevent Reputation Manipulation (`server/src/controllers/discussionController.ts` - accept answer ownership & once-only check)
+- [x] **Task 08:** Prevent Reputation Manipulation (COMPLETED - author validation, once-only acceptance, anti-reputation farming)
+- [ ] **Task 09:** Sanitize Search Expressions (`aiController.ts`, `resourceController.ts` - escape regex specials to prevent ReDoS)
 - [ ] **Tasks 04–10:** Security & Authorization Hardening
 - [ ] **Tasks 11–13:** Community Discussions & Answer Acceptance
 - [ ] **Tasks 14–15:** Real-Time Study Room Chat & Presence
@@ -83,5 +84,5 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 07: Fix Flashcard Permissions.
-- **Immediate Next Task:** Task 08: Prevent Reputation Manipulation (`server/src/controllers/discussionController.ts` - accept answer ownership & once-only check).
+- **Current Task:** Completed Task 08: Prevent Reputation Manipulation.
+- **Immediate Next Task:** Task 09: Sanitize Search Expressions (`aiController.ts`, `resourceController.ts` - escape regex specials to prevent ReDoS).

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Security
+- Prevented reputation manipulation in `server/src/controllers/discussionController.ts` and `server/src/routes/index.ts`: bound `verifySupabaseToken` and payload validation to answer acceptance, verified question author ownership, blocked multiple/duplicate answer acceptances, prevented self-acceptance reputation farming, and dispatched in-app peer notifications.
 - Enforced flashcard review ownership in `server/src/controllers/aiController.ts` and `server/src/routes/index.ts`: bound `verifySupabaseToken` to review submission endpoint, validated that reviewing user owns the associated flashcard deck or is an administrator, and rejected unauthorized attempts with 403 Forbidden.
 - Enforced document access permissions in `server/src/controllers/resourceController.ts` and `server/src/routes/index.ts`: added `isPrivate` attribute to Resource schema, allowed public downloads without auth while strictly requiring ownership or admin privileges for private downloads, and required authentication and ownership verification for upload confirmations.
 - Protected mentorship conversations in `server/src/controllers/mentorshipController.ts` and `server/src/routes/index.ts`: enforced strict student/mentor participant validation on message reads and writes, returning 401/403 for unauthorized access.
