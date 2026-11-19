@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import Lenis from 'lenis';
 import { Subject } from './types';
 import { api } from './lib/api';
 import { CanvasBackground } from './components/3d/CanvasBackground';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
+import { UploadModal } from './components/UploadModal';
 
 // Dedicated Screen Pages
 import { DirectoryPage } from './pages/DirectoryPage';
@@ -57,19 +59,57 @@ const AppContent: React.FC = () => {
     fetchSubjects();
   }, [fallbackSubjects]);
 
+  useEffect(() => {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let lenis: Lenis | null = null;
+    let frameId = 0;
+
+    const animateScroll = (time: number) => {
+      if (!lenis || motionPreference.matches) {
+        frameId = 0;
+        return;
+      }
+
+      lenis.raf(time);
+      frameId = requestAnimationFrame(animateScroll);
+    };
+
+    const stop = () => {
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = 0;
+      lenis?.destroy();
+      lenis = null;
+    };
+
+    const start = () => {
+      if (motionPreference.matches || lenis) return;
+      lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+      frameId = requestAnimationFrame(animateScroll);
+    };
+
+    const updateMotion = () => {
+      if (motionPreference.matches) stop();
+      else start();
+    };
+
+    start();
+    motionPreference.addEventListener('change', updateMotion);
+    return () => {
+      motionPreference.removeEventListener('change', updateMotion);
+      stop();
+    };
+  }, []);
+
   return (
-    <div className="relative min-h-screen bg-surface-base text-text-primary selection:bg-surface-interactive selection:text-text-secondary flex flex-col">
-      {/* 3D Constellation Canvas Background */}
+    <div className="relative min-h-screen bg-transparent text-text-primary flex flex-col">
       <CanvasBackground />
 
-      {/* Primary Sticky Header */}
       <Navbar
         onOpenUpload={() => setIsUploadOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
 
-      {/* Screen Routes */}
-      <div className="flex-1 flex flex-col">
+      <div className="relative z-10 flex-1 flex flex-col">
         <Routes>
           <Route
             path="/"
@@ -77,9 +117,6 @@ const AppContent: React.FC = () => {
               <DirectoryPage
                 subjects={subjects}
                 loading={loading}
-                onRefreshSubjects={fetchSubjects}
-                isUploadOpen={isUploadOpen}
-                onCloseUpload={() => setIsUploadOpen(false)}
                 onNavigateToAssistant={(code) => {
                   navigate(`/assistant${code ? `?subject=${code}` : ''}`);
                 }}
@@ -119,10 +156,17 @@ const AppContent: React.FC = () => {
         </Routes>
       </div>
 
-      {/* Secondary Footer Landmark */}
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
 
-      {/* Authentication Modal */}
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        subjects={subjects}
+        onUploadSuccess={fetchSubjects}
+      />
+
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}

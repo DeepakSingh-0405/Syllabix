@@ -5,24 +5,17 @@ import { FilterPills } from '../components/FilterPills';
 import { SyllabusCard } from '../components/SyllabusCard';
 import { DetailsDrawer } from '../components/DetailsDrawer';
 import { FlashcardDeckModal } from '../components/FlashcardDeckModal';
-import { UploadModal } from '../components/UploadModal';
 import { RotateCcw } from 'lucide-react';
 
 interface DirectoryPageProps {
   subjects: Subject[];
   loading: boolean;
-  onRefreshSubjects: () => void;
-  isUploadOpen: boolean;
-  onCloseUpload: () => void;
   onNavigateToAssistant: (subjectCode?: string) => void;
 }
 
 export const DirectoryPage: React.FC<DirectoryPageProps> = ({
   subjects,
   loading,
-  onRefreshSubjects,
-  isUploadOpen,
-  onCloseUpload,
   onNavigateToAssistant,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +39,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
       const matchesSearch = searchQuery.trim()
         ? s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.description.toLowerCase().includes(searchQuery.toLowerCase())
+          (s.description || '').toLowerCase().includes(searchQuery.toLowerCase())
         : true;
       return matchesCode && matchesSearch;
     });
@@ -70,14 +63,14 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
       />
 
       {/* Main Syllabus Directory Grid (WCAG A11Y-05: Target of Skip Link) */}
-      <main id="main-content" className="w-full max-w-[1440px] mx-auto px-space-4 pt-6 pb-12">
+      <main id="main-content" aria-busy={loading} className="w-full max-w-[1440px] mx-auto px-space-4 pt-6 pb-12">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-4 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 py-8" role="status" aria-label="Loading syllabi">
             {Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
-                className="h-[200px] bg-surface-muted border border-border-default rounded-lg animate-pulse"
-                aria-label="Loading syllabus card"
+                className="h-[220px] bg-surface-muted border border-border-default rounded-xl animate-pulse"
+                aria-hidden="true"
               />
             ))}
           </div>
@@ -85,7 +78,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
           <ul
             role="list"
             aria-label="All syllabi"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-4"
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"
           >
             {filteredSubjects.map((subject) => (
               <SyllabusCard
@@ -143,13 +136,6 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
         subject={flashcardSubject}
       />
 
-      {/* Upload Modal */}
-      <UploadModal
-        isOpen={isUploadOpen}
-        onClose={onCloseUpload}
-        subjects={subjects}
-        onUploadSuccess={onRefreshSubjects}
-      />
     </>
   );
 };
