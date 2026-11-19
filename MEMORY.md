@@ -93,17 +93,18 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 31:** Handle Backend Unavailable in Client API (COMPLETED - ApiClientError, isBackendUnavailableError, HTML error page tolerance, 15s timeout, isomorphic env access)
 - [x] **Phase 9 (Tasks 30–31):** User Onboarding & Resilience (COMPLETED)
 - [x] **Task 32:** Provide Booking Confirmation Feedback (COMPLETED - rich confirmation card, live chat action, duplicate submission prevention, dismissible error banner)
-- [ ] **Task 33:** Add Notification Badge Counter (`client/src/components/Navbar.tsx`, `client/src/components/NotificationBell.tsx`)
-- [ ] **Tasks 34–36:** Flashcards SM-2 & Subject Directory Filters
+- [x] **Task 33:** Add Notification Badge Counter (COMPLETED - reactive numerical badge with 9+ cap, dynamic aria-label, item mark-as-read, click-outside dismissal)
+- [ ] **Task 34:** Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`)
+- [ ] **Tasks 35–36:** Subject Directory Semester/Branch Filters & Upload Modal Trigger
 - [ ] **Tasks 37–38:** E2E Verification & Release Audit
 
 ---
 
 ## G. Known Issues & Tech Debt
-1. Notification bell needs an unread counter badge synchronized with the backend.
+1. Flashcard review interval calculation needs complete SuperMemo SM-2 repetition, ease-factor, and next due date scheduling.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 32: Provide Booking Confirmation Feedback (`client/src/pages/MentorshipPage.tsx`).
-- **Immediate Next Task:** Task 33: Add Notification Badge Counter (`client/src/components/Navbar.tsx`, `client/src/components/NotificationBell.tsx`).
+- **Current Task:** Completed Task 33: Add Notification Badge Counter (`client/src/components/NotificationBell.tsx`).
+- **Immediate Next Task:** Task 34: Implement SM-2 Review Interval Scheduling (`server/src/controllers/aiController.ts`).
