@@ -1,5 +1,6 @@
 import React from 'react';
 import { Subject } from '../types';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, BookMarked, Layers } from 'lucide-react';
 
 interface SyllabusCardProps {
@@ -8,19 +9,28 @@ interface SyllabusCardProps {
 }
 
 export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetails }) => {
+  const reduceMotion = useReducedMotion();
+
   return (
     <li role="listitem" className="list-none">
-      <article className="relative flex flex-col justify-between h-full bg-surface-muted border border-border-default rounded-lg p-space-4 hover:bg-surface-interactive hover:border-border-interactive hover:shadow-md transition-all duration-base group">
+      <motion.article
+        initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={reduceMotion ? undefined : { y: -5, rotateX: 1 }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transformPerspective: 1000, transformStyle: 'preserve-3d' }}
+        className="syllabus-card group relative flex h-full flex-col justify-between rounded-xl border border-border-default bg-surface-muted p-5 transition-colors duration-base hover:border-border-interactive hover:bg-surface-interactive hover:shadow-md"
+      >
         {/* Top Meta Row */}
         <div>
           <div className="flex items-center justify-between mb-space-3">
-            <span className="text-[12px] font-medium text-text-tertiary bg-surface-base px-2 py-0.5 rounded-sm border border-border-default">
+            <span className="rounded-md border border-accent/20 bg-accent/10 px-2.5 py-1 font-mono text-[11px] font-medium tracking-wide text-accent-strong">
               {subject.code}
             </span>
-            <div className="flex items-center gap-1.5 text-text-tertiary">
+            <div className="flex items-center gap-2 text-text-tertiary">
               <span className="text-[12px]">Sem {subject.semester}</span>
               {subject.isCore && (
-                <span className="text-[12px] font-medium text-text-secondary bg-surface-interactive border border-border-interactive px-1.5 py-0.5 rounded-sm">
+                <span className="rounded-full border border-accent-green/20 bg-accent-green/10 px-2 py-0.5 text-[11px] font-medium text-accent-green">
                   Core
                 </span>
               )}
@@ -28,7 +38,7 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
           </div>
 
           {/* Title with Mandatory Stretched Link Architecture (A11Y-03, A11Y-05) */}
-          <h3 className="text-[18px] leading-[24px] font-semibold text-text-secondary group-hover:text-text-secondary transition-colors line-clamp-1 mb-2">
+          <h3 className="mb-2 min-h-[48px] line-clamp-2 text-[18px] leading-[24px] font-semibold text-text-secondary transition-colors group-hover:text-accent-strong">
             <a
               href={`#details-${subject.code}`}
               onClick={(e) => {
@@ -41,14 +51,14 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
             </a>
           </h3>
 
-          {/* Description — Strictly uses --color-text-tertiary (#a6a6a6) for >= 4.5:1 contrast on #080808 (A11Y-01) */}
-          <p className="text-[14px] leading-[20px] font-light text-text-tertiary line-clamp-2 min-h-[40px] mb-space-4">
+          {/* Description */}
+          <p className="mb-space-4 min-h-[40px] line-clamp-2 text-[14px] leading-[20px] font-light text-text-tertiary">
             {subject.description || 'Structured academic learning syllabus including core units, topic breakdown, and examination modules.'}
           </p>
         </div>
 
         {/* Footer Meta Row */}
-        <div className="flex items-center justify-between pt-space-3 border-t border-border-default/60 mt-auto">
+        <div className="mt-auto flex items-center justify-between border-t border-border-default/60 pt-space-3">
           <div className="flex items-center gap-space-2 text-[12px] text-text-tertiary">
             <span className="inline-flex items-center gap-1">
               <Layers className="w-3.5 h-3.5" aria-hidden="true" />
@@ -62,11 +72,11 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
           </div>
 
           {/* Trailing Indicator */}
-          <div className="text-text-tertiary group-hover:text-text-secondary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-fast">
+          <div className="text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-fast">
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </div>
         </div>
-      </article>
+      </motion.article>
     </li>
   );
 };

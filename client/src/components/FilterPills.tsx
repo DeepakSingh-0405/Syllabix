@@ -46,14 +46,14 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
         className="flex items-center gap-space-1 overflow-x-auto scrollbar-none py-1 scroll-smooth"
       >
         {/* "All" Filter Pill */}
-        <li>
+        <li className="shrink-0">
           <button
             type="button"
             aria-pressed={selectedSubject === null}
             onClick={() => onSelectSubject(null)}
             onKeyDown={(e) => handleKeyDown(e, 0)}
             tabIndex={selectedSubject === null ? 0 : -1}
-            className={`inline-flex items-center gap-2 h-8 px-3 rounded-full text-[13px] transition-all duration-fast ${
+            className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[13px] transition-all duration-fast ${
               selectedSubject === null
                 ? 'bg-surface-interactive text-text-secondary border border-text-secondary font-medium'
                 : 'bg-transparent text-text-primary border border-border-default hover:bg-surface-interactive hover:text-text-secondary hover:border-text-tertiary'
@@ -68,14 +68,14 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
         {subjects.map((sub, idx) => {
           const isSelected = selectedSubject === sub.code;
           return (
-            <li key={sub.code}>
+            <li key={sub.code} className="shrink-0">
               <button
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => onSelectSubject(isSelected ? null : sub.code)}
                 onKeyDown={(e) => handleKeyDown(e, idx + 1)}
                 tabIndex={isSelected ? 0 : -1}
-                className={`inline-flex items-center gap-2 h-8 px-3 rounded-full text-[13px] whitespace-nowrap transition-all duration-fast ${
+                className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[13px] transition-all duration-fast ${
                   isSelected
                     ? 'bg-surface-interactive text-text-secondary border border-text-secondary font-medium'
                     : 'bg-transparent text-text-primary border border-border-default hover:bg-surface-interactive hover:text-text-secondary hover:border-text-tertiary'

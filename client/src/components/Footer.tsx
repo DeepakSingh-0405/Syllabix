@@ -47,14 +47,14 @@ export const Footer: React.FC = () => {
             <ul role="list" className="space-y-1.5 text-[13px] text-text-tertiary">
               <li><span className="text-text-tertiary">MERN (MongoDB + Express + React)</span></li>
               <li><span className="text-text-tertiary">Supabase Auth, Storage & Realtime</span></li>
-              <li><span className="text-text-tertiary">Google Gemini 1.5 Flash AI</span></li>
-              <li><span className="text-text-tertiary">Design token engine (design.md)</span></li>
+              <li><span className="text-text-tertiary">Google Gemini AI assistance</span></li>
+              <li><span className="text-text-tertiary">Responsive design with accessible motion</span></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-border-default/60 flex flex-col sm:flex-row items-center justify-between text-[12px] text-text-tertiary gap-3">
-          <p>© 2026 Syllabix. Strictly built in accordance with design.md and WCAG 2.2 AA standards.</p>
+          <p>© 2026 Syllabix. A focused space for learning together.</p>
           <div className="flex items-center gap-4">
             <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="hover:text-text-secondary">Supabase Cloud</a>
             <span>•</span>
