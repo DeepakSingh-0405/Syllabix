@@ -75,7 +75,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 17:** Validate Storage Direct PUT (COMPLETED - safe URL validation, timeout/CORS error handling, confirmation gating)
 - [x] **Phase 5 (Tasks 16–17):** Document Upload & Ingestion Pipeline (COMPLETED)
 - [x] **Task 18:** Align Verified Resource Query (COMPLETED - replaced non-existent verificationStatus with verifiedResourceFilter for isVerified and legacy fallbacks)
-- [ ] **Task 19:** Compute Accurate Coverage Metrics (`server/src/controllers/analyticsController.ts`)
+- [x] **Task 19:** Compute Accurate Coverage Metrics (COMPLETED - implemented calculateCoverageMetrics with zero-topic/missing-unit safety and descriptive status)
 - [ ] **Task 20:** Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`)
 - [ ] **Tasks 21–24:** Database & Backend Reliability
 - [ ] **Tasks 25–29:** AI Study Assistant Optimization
@@ -86,12 +86,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Subject curriculum coverage metrics in `server/src/controllers/analyticsController.ts` need accurate calculation.
-2. Leaderboard rankings need deterministic tie-breaking and 1-based indexing.
-3. Database seed needs idempotency checks to prevent duplicate records.
+1. Leaderboard rankings need deterministic tie-breaking and 1-based indexing.
+2. Database seed needs idempotency checks to prevent duplicate records.
+3. Study group creation needs authentic user ownership assignment.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 18: Align Verified Resource Query (`server/src/controllers/analyticsController.ts`).
-- **Immediate Next Task:** Task 19: Compute Accurate Coverage Metrics (`server/src/controllers/analyticsController.ts`).
+- **Current Task:** Completed Task 19: Compute Accurate Coverage Metrics (`server/src/controllers/analyticsController.ts`).
+- **Immediate Next Task:** Task 20: Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`).

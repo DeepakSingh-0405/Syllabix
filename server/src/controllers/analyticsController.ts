@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User';
-import { Subject, Unit } from '../models/Academic';
+import { Subject, Unit, Topic } from '../models/Academic';
 import { Resource } from '../models/Resource';
 import { Discussion } from '../models/Discussion';
 import { StudyGroup } from '../models/StudyGroup';
@@ -18,6 +18,104 @@ export const verifiedResourceFilter = {
     { verificationStatus: 'verified' },
   ],
 };
+
+export interface CoverageCalculationInput {
+  unitsCount: number;
+  topicsCount: number;
+  resources: Array<{ resourceType: string; topicIds?: any[] }>;
+}
+
+export interface CoverageCalculationResult {
+  coveragePercentage: number;
+  status: string;
+  hasSyllabusCopy: boolean;
+  hasNotes: boolean;
+  hasPapers: boolean;
+  hasLabManual: boolean;
+  gaps: string[];
+}
+
+/**
+ * Calculates curriculum topic coverage & identifies syllabus resource gaps.
+ * Clamps coverage strictly between 0 and 100 with weighted breadth and depth scoring.
+ */
+export function calculateCoverageMetrics(input: CoverageCalculationInput): CoverageCalculationResult {
+  const resourceTypes = input.resources.map(r => r.resourceType);
+  const hasSyllabusCopy = resourceTypes.includes('syllabus');
+  const hasNotes = resourceTypes.includes('lecture_notes');
+  const hasPapers = resourceTypes.includes('question_paper');
+  const hasLabManual = resourceTypes.includes('lab_manual');
+
+  let coveragePercentage = 0;
+  const gaps: string[] = [];
+
+  if (input.unitsCount === 0) {
+    gaps.push('No syllabus units defined for this subject');
+  }
+  if (input.topicsCount === 0 && input.unitsCount > 0) {
+    gaps.push('No detailed curriculum topics mapped to units');
+  }
+  if (!hasSyllabusCopy) gaps.push('Official departmental syllabus PDF unverified');
+  if (!hasNotes) gaps.push('Unit lecture notes pending student verification');
+  if (!hasPapers) gaps.push('Missing previous year question papers');
+
+  if (input.unitsCount === 0 && input.resources.length === 0) {
+    coveragePercentage = 0;
+  } else {
+    // 1. Resource breadth score (up to 40 points)
+    let breadthScore = 0;
+    if (hasSyllabusCopy) breadthScore += 15;
+    if (hasNotes) breadthScore += 15;
+    if (hasPapers) breadthScore += 10;
+
+    // 2. Unit/Topic depth score (up to 60 points)
+    let depthScore = 0;
+    if (input.topicsCount > 0) {
+      const coveredTopicSet = new Set<string>();
+      input.resources.forEach(r => {
+        if (Array.isArray(r.topicIds)) {
+          r.topicIds.forEach(tid => coveredTopicSet.add(tid.toString()));
+        }
+      });
+      const coveredTopicRatio = Math.min(1, coveredTopicSet.size / input.topicsCount);
+      if (coveredTopicSet.size === 0 && input.resources.length > 0) {
+        const estimatedCoverage = Math.min(1, input.resources.length / Math.max(1, input.unitsCount));
+        depthScore = Math.round(estimatedCoverage * 60);
+      } else {
+        depthScore = Math.round(coveredTopicRatio * 60);
+      }
+    } else if (input.unitsCount > 0) {
+      const unitCoverageRatio = Math.min(1, input.resources.length / input.unitsCount);
+      depthScore = Math.round(unitCoverageRatio * 60);
+    } else if (input.resources.length > 0) {
+      depthScore = Math.min(60, input.resources.length * 15);
+    }
+
+    coveragePercentage = Math.min(100, Math.max(0, breadthScore + depthScore));
+  }
+
+  // Determine descriptive coverage status
+  let status = 'Uncovered';
+  if (coveragePercentage >= 90 && hasPapers) {
+    status = 'Comprehensive';
+  } else if (coveragePercentage >= 75) {
+    status = hasPapers ? 'Adequate' : 'Needs Question Papers';
+  } else if (coveragePercentage >= 50) {
+    status = hasNotes ? 'Partial Coverage' : 'Needs Lecture Notes';
+  } else if (coveragePercentage > 0) {
+    status = 'Needs Verification';
+  }
+
+  return {
+    coveragePercentage,
+    status,
+    hasSyllabusCopy,
+    hasNotes,
+    hasPapers,
+    hasLabManual,
+    gaps,
+  };
+}
 
 /**
  * GET /api/v1/gamification/leaderboard
@@ -88,34 +186,24 @@ export const getSyllabusCoverage = async (req: Request, res: Response) => {
   try {
     const { subjectId } = req.params;
 
-    const subject = await Subject.findById(subjectId).lean();
+    const subject = await Subject.findById(subjectId).lean().catch(() => null);
     if (!subject) {
       return res.status(404).json({ success: false, error: { message: 'Subject not found' } });
     }
 
-    const units = await Unit.find({ subjectId }).lean();
+    const units = await Unit.find({ subjectId }).lean().catch(() => []);
+    const unitIds = units.map(u => u._id);
+    const topics = unitIds.length > 0 ? await Topic.find({ unitId: { $in: unitIds } }).lean().catch(() => []) : [];
     const resources = await Resource.find({
       subjectId,
       ...verifiedResourceFilter,
-    }).lean();
+    }).lean().catch(() => []);
 
-    const resourceTypes = resources.map(r => r.resourceType);
-    const hasSyllabusCopy = resourceTypes.includes('syllabus');
-    const hasNotes = resourceTypes.includes('lecture_notes');
-    const hasPapers = resourceTypes.includes('question_paper');
-    const hasLabManual = resourceTypes.includes('lab_manual');
-
-    // Calculate coverage metrics
-    let score = 20; // baseline
-    if (hasSyllabusCopy) score += 30;
-    if (hasNotes) score += 25;
-    if (hasPapers) score += 15;
-    if (hasLabManual) score += 10;
-
-    const gaps: string[] = [];
-    if (!hasPapers) gaps.push('Missing previous year question papers');
-    if (!hasNotes) gaps.push('Unit lecture notes pending student verification');
-    if (!hasSyllabusCopy) gaps.push('Official departmental syllabus PDF unverified');
+    const metrics = calculateCoverageMetrics({
+      unitsCount: units.length,
+      topicsCount: topics.length,
+      resources,
+    });
 
     res.json({
       success: true,
@@ -123,16 +211,18 @@ export const getSyllabusCoverage = async (req: Request, res: Response) => {
         subjectId: subject._id,
         code: subject.code,
         name: subject.name,
-        totalUnits: units.length || 5,
-        coveragePercentage: Math.min(100, score),
+        totalUnits: units.length,
+        totalTopics: topics.length,
+        coveragePercentage: metrics.coveragePercentage,
+        status: metrics.status,
         verifiedResourcesCount: resources.length,
         coverageBreakdown: {
-          syllabusCopy: hasSyllabusCopy,
-          lectureNotes: hasNotes,
-          questionPapers: hasPapers,
-          labManuals: hasLabManual,
+          syllabusCopy: metrics.hasSyllabusCopy,
+          lectureNotes: metrics.hasNotes,
+          questionPapers: metrics.hasPapers,
+          labManuals: metrics.hasLabManual,
         },
-        gaps,
+        gaps: metrics.gaps,
       },
     });
   } catch (err: any) {
