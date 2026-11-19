@@ -260,11 +260,11 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full min-w-0 flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
           <select
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="bg-surface-muted border border-border-interactive text-text-secondary text-[12px] px-2.5 py-1.5 rounded-md focus-visible:ring-2"
+            className="w-full min-w-0 rounded-md border border-border-interactive bg-surface-muted px-2.5 py-1.5 text-[12px] text-text-secondary focus-visible:ring-2 sm:w-auto"
           >
             <option value="all">All academic courses</option>
             {subjects.map((s) => (
@@ -277,7 +277,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
           <button
             type="button"
             onClick={() => setShowAskModal(true)}
-            className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-space-3 py-1.5 rounded-md hover:opacity-90 active:scale-[0.98] transition-all"
+            className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-text-secondary px-space-3 py-1.5 text-[13px] font-medium text-surface-base transition-all hover:opacity-90 active:scale-[0.98] sm:w-auto"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Ask question</span>
