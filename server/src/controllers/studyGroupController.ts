@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { StudyGroup } from '../models/StudyGroup';
 import { Subject } from '../models/Academic';
+import { seedDatabase } from '../config/seed';
 
 export const getStudyGroups = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,19 +17,15 @@ export const getStudyGroups = async (req: Request, res: Response): Promise<void>
       .lean();
 
     // Default seed if empty
-    if (groups.length === 0) {
-      const subject = await Subject.findOne();
-      if (subject) {
-        const defaultGroup = await StudyGroup.create({
-          name: `${subject.code} — Mid-Semester Exam Circle`,
-          subjectId: subject._id,
-          ownerId: subject.branchId, // placeholder ref
-          visibility: 'public',
-          schedule: 'Daily 7:00 PM - 9:00 PM IST',
-          activeTopic: 'Unit 2 & 3 Problem Solving and Proofs',
-          memberIds: [],
-        });
-        groups = [defaultGroup.toObject() as any];
+    if (groups.length === 0 && !subjectId) {
+      const totalGroups = await StudyGroup.countDocuments().catch(() => 0);
+      if (totalGroups === 0) {
+        await seedDatabase().catch(() => null);
+        groups = await StudyGroup.find(filter)
+          .populate('subjectId', 'name code semester')
+          .populate('ownerId', 'name avatarUrl reputationPoints')
+          .sort({ createdAt: -1 })
+          .lean();
       }
     }
 

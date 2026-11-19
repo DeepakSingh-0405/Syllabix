@@ -78,7 +78,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - [x] **Task 19:** Compute Accurate Coverage Metrics (COMPLETED - implemented calculateCoverageMetrics with zero-topic/missing-unit safety and descriptive status)
 - [x] **Task 20:** Normalize Leaderboard Ranking (COMPLETED - deterministic tie-breaking, 1-based competition ranks, and badge/tier alignment)
 - [x] **Phase 6 (Tasks 18–20):** Analytics Dashboard & Leaderboard Rankings (COMPLETED)
-- [ ] **Task 21:** Ensure Idempotent Database Seed (`server/src/config/seed.ts`)
+- [x] **Task 21:** Ensure Idempotent Database Seed (COMPLETED - unique-key check, centralized seedDatabase, zero duplicate insertions)
 - [ ] **Task 22:** Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`)
 - [ ] **Task 23:** Handle Mongo Disconnect Gracefully (`server/src/config/database.ts`)
 - [ ] **Task 24:** Expand Health Check Status (`server/src/routes/index.ts`)
@@ -90,12 +90,12 @@ This file maintains persistent architectural state, engineering decisions, and t
 ---
 
 ## G. Known Issues & Tech Debt
-1. Database seed needs idempotency checks to prevent duplicate records on repeated restarts.
-2. Study group creation needs authentic user ownership assignment.
-3. MongoDB disconnect handling needs graceful auto-recovery and health reporting.
+1. Study group creation needs authentic user ownership assignment.
+2. MongoDB disconnect handling needs graceful auto-recovery and health reporting.
+3. Health check route `/api/health` needs deep status checking for MongoDB and Supabase.
 
 ---
 
 ## H. Next Action
-- **Current Task:** Completed Task 20: Normalize Leaderboard Ranking (`server/src/controllers/analyticsController.ts`).
-- **Immediate Next Task:** Task 21: Ensure Idempotent Database Seed (`server/src/config/seed.ts`).
+- **Current Task:** Completed Task 21: Ensure Idempotent Database Seed (`server/src/config/seed.ts`).
+- **Immediate Next Task:** Task 22: Assign Study Group Owner Correctly (`server/src/controllers/studyGroupController.ts`).

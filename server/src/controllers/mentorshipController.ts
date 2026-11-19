@@ -4,6 +4,7 @@ import { MentorProfile, MentorshipRequest } from '../models/Mentorship';
 import { Notification } from '../models/Notification';
 import { User } from '../models/User';
 import { Subject } from '../models/Academic';
+import { seedDatabase } from '../config/seed';
 
 export const getMentors = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -13,32 +14,11 @@ export const getMentors = async (_req: Request, res: Response): Promise<void> =>
       .lean();
 
     if (mentors.length === 0) {
-      // Seed default mentors
-      const subjects = await Subject.find().limit(3);
-      if (subjects.length > 0) {
-        let mentorUser = await User.findOne({ role: 'mentor' });
-        if (!mentorUser) {
-          mentorUser = await User.create({
-            supabaseUserId: 'mentor-seed-001',
-            email: 'mentor.aryan@nit.edu',
-            name: 'Aryan Sharma (Final Year CSE)',
-            role: 'mentor',
-            reputationPoints: 340,
-          });
-        }
-
-        const seeded = await MentorProfile.create({
-          userId: mentorUser._id,
-          expertiseSubjectIds: subjects.map((s) => s._id),
-          bio: 'Specialist in Data Structures, OS concurrency, and university exam preparation.',
-          availability: 'Mon-Thu 6:00 PM - 8:00 PM IST',
-          rating: 4.95,
-          sessionsCompleted: 28,
-          verified: true,
-        });
-
-        mentors = [await MentorProfile.findById(seeded._id).populate('userId', 'name email avatarUrl reputationPoints').populate('expertiseSubjectIds', 'name code semester').lean() as any];
-      }
+      await seedDatabase().catch(() => null);
+      mentors = await MentorProfile.find()
+        .populate('userId', 'name email avatarUrl reputationPoints')
+        .populate('expertiseSubjectIds', 'name code semester')
+        .lean();
     }
 
     res.json({ success: true, data: mentors });
