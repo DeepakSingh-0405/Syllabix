@@ -275,7 +275,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
             <Users className="w-5 h-5 text-text-secondary" />
             <span>Collaborative study rooms</span>
           </h1>
-          <p className="text-[13px] text-text-tertiary">
+          <p className="text-[14px] text-text-tertiary">
             Real-time peer revision, exam problem solving, and syllabus discussions
           </p>
         </div>
@@ -287,7 +287,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-default bg-surface-muted text-[12px] text-text-tertiary hover:text-text-secondary hover:border-border-interactive transition-colors cursor-pointer"
             title="Click to view online scholars in this room"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-accent-green animate-pulse" />
             <span>{Math.max(activePeers.length, onlineUsers.length, 1)} active peers online</span>
           </button>
 
@@ -300,7 +300,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                 <button
                   type="button"
                   onClick={() => setShowPeerList(false)}
-                  className="text-[11px] text-text-tertiary hover:text-text-secondary px-1"
+                  className="text-[12px] text-text-tertiary hover:text-text-secondary px-1"
                 >
                   ✕
                 </button>
@@ -310,10 +310,10 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                   activePeers.map((peer, idx) => (
                     <div key={peer.userId || idx} className="flex items-center justify-between text-[12px] py-0.5">
                       <div className="flex items-center gap-1.5 truncate max-w-[150px]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent-green" />
                         <span className="text-text-secondary truncate">{peer.name}</span>
                       </div>
-                      <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-interactive rounded border border-border-default">
+                      <span className="text-[12px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-interactive rounded border border-border-default">
                         {peer.role || 'student'}
                       </span>
                     </div>
@@ -330,7 +330,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-space-3 py-1.5 rounded-md hover:opacity-90 active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[14px] px-space-3 py-1.5 rounded-md hover:opacity-90 active:scale-[0.98] transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Create study room</span>
@@ -352,7 +352,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                 <div key={i} className="h-24 bg-surface-muted border border-border-default rounded-md animate-pulse" />
               ))
             ) : rooms.length === 0 ? (
-              <div className="p-6 bg-surface-muted border border-border-default rounded-md text-center text-text-tertiary text-[13px]">
+              <div className="p-6 bg-surface-muted border border-border-default rounded-md text-center text-text-tertiary text-[14px]">
                 No active rooms. Be the first to create one!
               </div>
             ) : (
@@ -370,11 +370,11 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
+                      <span className="font-mono text-[12px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
                         {room.subjectId?.code || 'CS-COURSE'}
                       </span>
-                      <span className="text-[11px] text-text-tertiary flex items-center gap-1">
-                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+                      <span className="text-[12px] text-text-tertiary flex items-center gap-1">
+                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />}
                         <Users className="w-3 h-3" />
                         <span>{isSelected ? Math.max(activePeers.length, 1) : (room.memberIds?.length || 4)} members</span>
                       </span>
@@ -388,7 +388,7 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                       {room.activeTopic}
                     </p>
 
-                    <div className="flex items-center gap-1 text-[11px] text-text-tertiary pt-1 border-t border-border-default/50">
+                    <div className="flex items-center gap-1 text-[12px] text-text-tertiary pt-1 border-t border-border-default/50">
                       <Calendar className="w-3 h-3" />
                       <span>{room.schedule}</span>
                     </div>
@@ -421,17 +421,17 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
 
                 <div className="flex items-center gap-2">
                   {connectionState === 'connected' ? (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-green bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent-green bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
                       <span className="w-2 h-2 rounded-full bg-accent-green animate-pulse" />
                       <span>Live Realtime</span>
                     </span>
                   ) : connectionState === 'connecting' || connectionState === 'reconnecting' ? (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-400 bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent-cyan bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                      <span className="w-2 h-2 rounded-full bg-accent-cyan animate-ping" />
                       <span>Connecting...</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-tertiary bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-text-tertiary bg-surface-interactive px-2.5 py-1 rounded border border-border-default">
                       <span className="w-2 h-2 rounded-full bg-text-disabled" />
                       <span>Offline Mode</span>
                     </span>
@@ -457,17 +457,17 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                           {msg.senderName}
                         </span>
                         {msg.senderRole && (
-                          <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-interactive rounded border border-border-default">
+                          <span className="text-[12px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-interactive rounded border border-border-default">
                             {msg.senderRole}
                           </span>
                         )}
-                        <span className="text-[11px] text-text-tertiary">
+                        <span className="text-[12px] text-text-tertiary">
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
 
                       <div
-                        className={`max-w-xl p-space-3 rounded-lg text-[13px] leading-relaxed border ${
+                        className={`max-w-xl p-space-3 rounded-lg text-[14px] leading-relaxed border ${
                           isMe
                             ? 'bg-surface-interactive border-border-interactive text-text-secondary'
                             : 'bg-surface-muted border-border-default text-text-primary'
@@ -483,12 +483,12 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                     key={notice.id}
                     className="flex items-center justify-center my-1"
                   >
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-tertiary bg-surface-interactive/60 border border-border-default/40 px-2.5 py-0.5 rounded-full">
-                      <span className={`w-1.5 h-1.5 rounded-full ${notice.type === 'join' ? 'bg-emerald-400' : 'bg-text-disabled'}`} />
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-text-tertiary bg-surface-interactive/60 border border-border-default/40 px-2.5 py-0.5 rounded-full">
+                      <span className={`w-1.5 h-1.5 rounded-full ${notice.type === 'join' ? 'bg-accent-green' : 'bg-text-disabled'}`} />
                       <span>
                         {notice.name} {notice.type === 'join' ? 'joined the study circle' : 'left the study circle'}
                       </span>
-                      <span className="text-[10px] text-text-disabled">({notice.timestamp})</span>
+                      <span className="text-[12px] text-text-disabled">({notice.timestamp})</span>
                     </span>
                   </div>
                 ))}
@@ -505,13 +505,13 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder={`Message #${activeRoom.name}...`}
-                  className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[13px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
+                  className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[14px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
                 />
                 <button
                   type="submit"
                   disabled={sending || !inputMessage.trim()}
                   aria-label="Send message"
-                  className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
+                  className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[14px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Send</span>
@@ -603,14 +603,14 @@ export const StudyRoomsPage: React.FC<StudyRoomsPageProps> = ({ subjects }) => {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-md bg-surface-base text-text-secondary border border-border-default hover:bg-surface-interactive text-[13px] font-medium transition-colors"
+                  className="px-4 py-2 rounded-md bg-surface-base text-text-secondary border border-border-default hover:bg-surface-interactive text-[14px] font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-text-secondary text-surface-base text-[13px] font-medium hover:opacity-90 disabled:opacity-50 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-text-secondary text-surface-base text-[14px] font-medium hover:opacity-90 disabled:opacity-50 transition-all"
                 >
                   {creating ? 'Creating...' : 'Create room'}
                 </button>

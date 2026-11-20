@@ -40,6 +40,10 @@ async function runTests() {
   };
 
   // Mock Resource.findById and findByIdAndUpdate
+  const originalFindById = (Resource as any).findById;
+  const originalFindByIdAndUpdate = (Resource as any).findByIdAndUpdate;
+  const originalStorageFrom = (supabaseAdmin.storage as any).from;
+
   (Resource as any).findById = (id: string) => {
     if (String(id) === String(mockPublicResource._id)) return mockPublicResource;
     if (String(id) === String(mockPrivateResource._id)) return mockPrivateResource;
@@ -235,6 +239,10 @@ async function runTests() {
   } catch (err) {
     console.error('Test failure:', err);
     process.exit(1);
+  } finally {
+    (Resource as any).findById = originalFindById;
+    (Resource as any).findByIdAndUpdate = originalFindByIdAndUpdate;
+    (supabaseAdmin.storage as any).from = originalStorageFrom;
   }
 }
 

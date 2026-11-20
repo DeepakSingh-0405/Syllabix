@@ -102,7 +102,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Mode Selector Tabs */}
-        <div className="grid grid-cols-2 gap-1 bg-surface-base p-1 rounded-md border border-border-default mb-space-3 text-[13px]">
+        <div className="grid grid-cols-2 gap-1 bg-surface-base p-1 rounded-md border border-border-default mb-space-3 text-[14px]">
           <button
             type="button"
             onClick={() => { setMode('signin'); setError(null); }}
@@ -212,7 +212,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-border-default" />
           </div>
-          <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
+          <div className="relative flex justify-center text-[12px] uppercase tracking-wider">
             <span className="bg-surface-muted px-2 text-text-tertiary">Or alternative options</span>
           </div>
         </div>
@@ -222,7 +222,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 bg-surface-base border border-border-interactive text-text-secondary font-medium text-[13px] py-2 rounded-md hover:bg-surface-interactive hover:border-text-secondary transition-colors mb-1"
+          className="w-full inline-flex items-center justify-center gap-2 bg-surface-base border border-border-interactive text-text-secondary font-medium text-[14px] py-2 rounded-md hover:bg-surface-interactive hover:border-text-secondary transition-colors mb-1"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -244,13 +244,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </svg>
           <span>Continue with Google</span>
         </button>
-        <p className="text-[11px] text-text-tertiary text-center mb-2">
+        <p className="text-[12px] text-text-tertiary text-center mb-2">
           Note: Google OAuth requires configuring Client ID in Supabase. Or use Email or Demo below.
         </p>
 
         {/* Instant Zero-Setup Demo Sign-In */}
         <div className="pt-2 border-t border-border-default/60 mt-1">
-          <p className="text-[11px] font-medium text-text-tertiary mb-1.5 text-center">
+          <p className="text-[12px] font-medium text-text-tertiary mb-1.5 text-center">
             Zero-configuration testing
           </p>
           <div className="grid grid-cols-2 gap-2">

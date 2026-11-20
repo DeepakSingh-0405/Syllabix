@@ -73,7 +73,7 @@ export const AnalyticsPage: React.FC = () => {
             <BarChart3 className="w-5 h-5 text-text-secondary" />
             <span>Institutional curriculum analytics & gap analysis</span>
           </h1>
-          <p className="text-[13px] text-text-tertiary">
+          <p className="text-[14px] text-text-tertiary">
             Departmental syllabus completeness, vector chunk indexing, and academic coverage health
           </p>
         </div>
@@ -87,68 +87,68 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-space-4">
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">Subjects</span>
+            <span className="text-[12px] uppercase">Subjects</span>
             <BookOpen className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.totalSubjects}
           </div>
-          <span className="text-[11px] text-text-tertiary">Active courses</span>
+          <span className="text-[12px] text-text-tertiary">Active courses</span>
         </div>
 
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">Resources</span>
+            <span className="text-[12px] uppercase">Resources</span>
             <FileText className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.verifiedResources}
           </div>
-          <span className="text-[11px] text-text-tertiary">Verified documents</span>
+          <span className="text-[12px] text-text-tertiary">Verified documents</span>
         </div>
 
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">Vector Chunks</span>
+            <span className="text-[12px] uppercase">Vector Chunks</span>
             <Database className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.vectorChunksIndexed}
           </div>
-          <span className="text-[11px] text-text-tertiary">Grounded index</span>
+          <span className="text-[12px] text-text-tertiary">Grounded index</span>
         </div>
 
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">Study Rooms</span>
+            <span className="text-[12px] uppercase">Study Rooms</span>
             <Layers className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.activeStudyRooms}
           </div>
-          <span className="text-[11px] text-text-tertiary">Realtime circles</span>
+          <span className="text-[12px] text-text-tertiary">Realtime circles</span>
         </div>
 
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">Doubts Solved</span>
+            <span className="text-[12px] uppercase">Doubts Solved</span>
             <CheckCircle2 className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.discussionsResolved}
           </div>
-          <span className="text-[11px] text-text-tertiary">Accepted answers</span>
+          <span className="text-[12px] text-text-tertiary">Accepted answers</span>
         </div>
 
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="flex items-center justify-between text-text-tertiary mb-1">
-            <span className="text-[11px] uppercase">RAG Precision</span>
+            <span className="text-[12px] uppercase">RAG Precision</span>
             <BarChart3 className="w-3.5 h-3.5" />
           </div>
-          <div className="text-[22px] font-semibold text-text-secondary">
+          <div className="text-[20px] font-semibold text-text-secondary">
             {metrics?.retrievalAccuracy}
           </div>
-          <span className="text-[11px] text-text-tertiary">Grounding score</span>
+          <span className="text-[12px] text-text-tertiary">Grounding score</span>
         </div>
       </div>
 
@@ -186,7 +186,7 @@ export const AnalyticsPage: React.FC = () => {
               ) : (
                 subjectCoverage.map((item) => (
                   <tr key={item.code} className="hover:bg-surface-interactive/40 transition-colors">
-                    <td className="px-6 py-4 font-mono font-semibold text-text-secondary text-[13px]">
+                    <td className="px-6 py-4 font-mono font-semibold text-text-secondary text-[14px]">
                       {item.code}
                     </td>
                     <td className="px-6 py-4 font-medium text-text-secondary text-[14px]">

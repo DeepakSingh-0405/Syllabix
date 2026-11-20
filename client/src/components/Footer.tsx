@@ -14,15 +14,15 @@ export const Footer: React.FC = () => {
               </span>
               <span>Syllabix</span>
             </div>
-            <p className="text-[13px] text-text-tertiary leading-[20px] font-light">
+            <p className="text-[14px] text-text-tertiary leading-[20px] font-light">
               AI-powered academic syllabus and knowledge directory built on MERN, Supabase, and Google Gemini.
             </p>
           </div>
 
           {/* Academic Hierarchy */}
           <div className="space-y-2">
-            <p className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Curriculum</p>
-            <ul role="list" className="space-y-1.5 text-[13px] text-text-tertiary">
+            <p className="text-[12px] font-semibold text-text-secondary uppercase tracking-wider">Curriculum</p>
+            <ul role="list" className="space-y-1.5 text-[14px] text-text-tertiary">
               <li><a href="#computer-science" className="hover:text-text-secondary transition-colors">Computer science & engineering</a></li>
               <li><a href="#semesters" className="hover:text-text-secondary transition-colors">Semesters 1 through 8</a></li>
               <li><a href="#syllabi" className="hover:text-text-secondary transition-colors">Core curriculum modules</a></li>
@@ -32,8 +32,8 @@ export const Footer: React.FC = () => {
 
           {/* Platform Primitives */}
           <div className="space-y-2">
-            <p className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Features</p>
-            <ul role="list" className="space-y-1.5 text-[13px] text-text-tertiary">
+            <p className="text-[12px] font-semibold text-text-secondary uppercase tracking-wider">Features</p>
+            <ul role="list" className="space-y-1.5 text-[14px] text-text-tertiary">
               <li><a href="#rag-assistant" className="hover:text-text-secondary transition-colors">Document-grounded RAG</a></li>
               <li><a href="#ai-summaries" className="hover:text-text-secondary transition-colors">Revision note generator</a></li>
               <li><a href="#practice-quizzes" className="hover:text-text-secondary transition-colors">Exam practice tests</a></li>
@@ -43,8 +43,8 @@ export const Footer: React.FC = () => {
 
           {/* Architecture & Stack */}
           <div className="space-y-2">
-            <p className="text-[13px] font-semibold text-text-secondary uppercase tracking-wider">Architecture</p>
-            <ul role="list" className="space-y-1.5 text-[13px] text-text-tertiary">
+            <p className="text-[12px] font-semibold text-text-secondary uppercase tracking-wider">Architecture</p>
+            <ul role="list" className="space-y-1.5 text-[14px] text-text-tertiary">
               <li><span className="text-text-tertiary">MERN (MongoDB + Express + React)</span></li>
               <li><span className="text-text-tertiary">Supabase Auth, Storage & Realtime</span></li>
               <li><span className="text-text-tertiary">Google Gemini AI assistance</span></li>

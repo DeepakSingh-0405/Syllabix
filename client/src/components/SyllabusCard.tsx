@@ -25,7 +25,7 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
         {/* Top Meta Row */}
         <div>
           <div className="flex items-center justify-between mb-space-3">
-            <span className="rounded-md border border-accent/20 bg-accent/10 px-2.5 py-1 font-mono text-[11px] font-medium tracking-wide text-accent-strong">
+            <span className="rounded-md border border-accent/20 bg-accent/10 px-2.5 py-1 font-mono text-[12px] font-medium tracking-wide text-accent-strong">
               {subject.code}
             </span>
             <div className="flex items-center gap-2 text-text-tertiary">
@@ -37,7 +37,7 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
                     e.preventDefault();
                     onOpenUpload(subject);
                   }}
-                  className="relative z-20 inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary hover:text-accent-strong py-0.5 px-1.5 rounded hover:bg-surface-base border border-transparent hover:border-border-default transition-all"
+                  className="relative z-20 inline-flex items-center gap-1 text-[12px] font-medium text-text-tertiary hover:text-accent-strong py-0.5 px-1.5 rounded hover:bg-surface-base border border-transparent hover:border-border-default transition-all"
                   title={`Upload syllabus for ${subject.code}`}
                   aria-label={`Upload syllabus for ${subject.code}`}
                 >
@@ -47,7 +47,7 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({ subject, onOpenDetai
               )}
               <span className="text-[12px]">Sem {subject.semester}</span>
               {subject.isCore && (
-                <span className="rounded-full border border-accent-green/20 bg-accent-green/10 px-2 py-0.5 text-[11px] font-medium text-accent-green">
+                <span className="rounded-full border border-accent-green/20 bg-accent-green/10 px-2 py-0.5 text-[12px] font-medium text-accent-green">
                   Core
                 </span>
               )}

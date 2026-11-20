@@ -37,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload, onOpenAuth }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const getNavLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 text-[13px] font-medium transition-colors ${
+    `inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 text-[14px] font-medium transition-colors ${
       isActive
         ? 'border-accent/30 bg-accent/10 text-accent-strong'
         : 'border-transparent text-text-primary hover:border-border-default hover:bg-surface-interactive hover:text-text-secondary'
@@ -152,10 +152,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload, onOpenAuth }) => {
               {session ? (
                 <div className="flex items-center justify-between px-2 py-1.5">
                   <div className="flex flex-col min-w-0 pr-2">
-                    <span className="text-[13px] text-text-secondary font-medium truncate">
+                    <span className="text-[14px] text-text-secondary font-medium truncate">
                       {profile?.name || session.user.email?.split('@')[0]}
                     </span>
-                    <span className="text-[11px] text-text-tertiary truncate">
+                    <span className="text-[12px] text-text-tertiary truncate">
                       {session.user.email}
                     </span>
                   </div>
@@ -178,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload, onOpenAuth }) => {
                     setIsMenuOpen(false);
                     onOpenAuth();
                   }}
-                  className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-interactive text-text-secondary text-[13px] font-medium border border-border-interactive hover:bg-surface-elevated transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-interactive text-text-secondary text-[14px] font-medium border border-border-interactive hover:bg-surface-elevated transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
                   <span>Sign in</span>

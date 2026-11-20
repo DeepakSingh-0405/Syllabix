@@ -241,7 +241,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <span className="text-[12px] text-text-tertiary">Active filters:</span>
             {selectedBranch !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-accent/15 text-accent-strong border border-accent/30">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-accent/15 text-accent-strong border border-accent/30">
                 Branch: {selectedBranch}
                 <button
                   type="button"
@@ -254,7 +254,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
               </span>
             )}
             {selectedSemester !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-accent-green/15 text-accent-green border border-accent-green/30">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-accent-green/15 text-accent-green border border-accent-green/30">
                 Semester {selectedSemester}
                 <button
                   type="button"
@@ -267,7 +267,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
               </span>
             )}
             {selectedSubjectCode && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-surface-interactive text-text-secondary border border-border-interactive">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-interactive text-text-secondary border border-border-interactive">
                 Subject: {selectedSubjectCode}
                 <button
                   type="button"
@@ -280,7 +280,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
               </span>
             )}
             {searchQuery.trim() && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-surface-interactive text-text-secondary border border-border-interactive">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-interactive text-text-secondary border border-border-interactive">
                 &ldquo;{searchQuery.trim()}&rdquo;
                 <button
                   type="button"
@@ -292,7 +292,7 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
                 </button>
               </span>
             )}
-            <span className="text-[11px] text-text-tertiary ml-auto">
+            <span className="text-[12px] text-text-tertiary ml-auto">
               Showing {filteredSubjects.length} of {subjects.length} courses
             </span>
           </div>

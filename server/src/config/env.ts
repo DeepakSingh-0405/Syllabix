@@ -30,7 +30,7 @@ const envSchema = z.object({
   ALLOW_DEMO_TOKENS: z
     .string()
     .optional()
-    .transform((val) => val === 'true'),
+    .transform((val) => (val !== undefined ? val === 'true' : process.env.NODE_ENV !== 'production')),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -57,7 +57,10 @@ export const env = parsedEnv.success
       GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
       GEMINI_EMBEDDING_MODEL: process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004',
       REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
-      ALLOW_DEMO_TOKENS: process.env.ALLOW_DEMO_TOKENS === 'true',
+      ALLOW_DEMO_TOKENS:
+        process.env.ALLOW_DEMO_TOKENS !== undefined
+          ? process.env.ALLOW_DEMO_TOKENS === 'true'
+          : process.env.NODE_ENV !== 'production',
     };
 
 /**

@@ -255,7 +255,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
             <Award className="w-5 h-5 text-text-secondary" />
             <span>Senior-junior mentorship hub</span>
           </h1>
-          <p className="text-[13px] text-text-tertiary">
+          <p className="text-[14px] text-text-tertiary">
             Connect directly with verified high-reputation scholars and course mentors
           </p>
         </div>
@@ -314,14 +314,14 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                       {mentor.expertiseSubjectIds?.map((sub) => (
                         <span
                           key={sub._id || sub.code}
-                          className="font-mono text-[10px] bg-surface-base px-1.5 py-0.5 rounded border border-border-default text-text-secondary"
+                          className="font-mono text-[12px] bg-surface-base px-1.5 py-0.5 rounded border border-border-default text-text-secondary"
                         >
                           {sub.code}
                         </span>
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-text-tertiary pt-1 border-t border-border-default/50">
+                    <div className="flex items-center justify-between text-[12px] text-text-tertiary pt-1 border-t border-border-default/50">
                       <span>{mentor.sessionsCompleted} sessions completed</span>
                       <span className="font-medium text-text-secondary">{mentor.userId?.reputationPoints || 100} pts</span>
                     </div>
@@ -343,7 +343,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                     <h2 className="text-[16px] font-semibold text-text-secondary">
                       {selectedMentor.userId?.name}
                     </h2>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-text-secondary bg-surface-interactive border border-border-interactive px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-[12px] text-text-secondary bg-surface-interactive border border-border-interactive px-2 py-0.5 rounded-full">
                       <CheckCircle2 className="w-3 h-3 text-text-secondary" />
                       <span>Verified scholar</span>
                     </span>
@@ -396,13 +396,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                             <span className="text-[12px] font-medium text-text-secondary">
                               {msg.senderName}
                             </span>
-                            <span className="text-[11px] text-text-tertiary">
+                            <span className="text-[12px] text-text-tertiary">
                               {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
 
                           <div
-                            className={`max-w-xl p-space-3 rounded-lg text-[13px] leading-relaxed border ${
+                            className={`max-w-xl p-space-3 rounded-lg text-[14px] leading-relaxed border ${
                               isMe
                                 ? 'bg-surface-interactive border-border-interactive text-text-secondary'
                                 : 'bg-surface-muted border-border-default text-text-primary'
@@ -426,12 +426,12 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       placeholder={`Ask ${selectedMentor.userId?.name?.split(' ')[0]} a question...`}
-                      className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[13px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
+                      className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[14px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
                     />
                     <button
                       type="submit"
                       disabled={!inputMessage.trim()}
-                      className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
+                      className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[14px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Send</span>
@@ -451,7 +451,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                     <div className="pt-2 flex flex-wrap gap-2">
                       <span className="text-[12px] text-text-tertiary font-medium">Areas of guidance:</span>
                       {selectedMentor.expertiseSubjectIds?.map((sub) => (
-                        <span key={sub._id} className="text-[11px] text-text-secondary bg-surface-muted px-2 py-0.5 rounded border border-border-default font-mono">
+                        <span key={sub._id} className="text-[12px] text-text-secondary bg-surface-muted px-2 py-0.5 rounded border border-border-default font-mono">
                           {sub.code} — {sub.name}
                         </span>
                       ))}
@@ -521,7 +521,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({ subjects }) => {
                           <button
                             type="button"
                             onClick={() => setBookingError(null)}
-                            className="text-text-tertiary hover:text-text-secondary text-[11px] underline"
+                            className="text-text-tertiary hover:text-text-secondary text-[12px] underline"
                           >
                             Dismiss
                           </button>

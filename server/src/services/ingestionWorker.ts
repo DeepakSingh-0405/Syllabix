@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Resource } from '../models/Resource';
 import { DocumentChunk } from '../models/DocumentChunk';
 import { supabaseAdmin, BUCKETS } from '../config/supabase';
@@ -6,6 +7,11 @@ import { geminiService } from './geminiService';
 import { cacheService } from './redisService';
 
 export async function processDocumentIngestion(resourceId: string): Promise<boolean> {
+  if (mongoose.connection.readyState === 0) {
+    console.warn(`[IngestionWorker] MongoDB is disconnected (readyState 0). Ingestion skipped for ${resourceId}.`);
+    return false;
+  }
+
   // Acquire distributed lock to prevent duplicate concurrent runs
   const lockAcquired = await cacheService.acquireLock(resourceId, 300);
   if (!lockAcquired) {
@@ -29,15 +35,18 @@ export async function processDocumentIngestion(resourceId: string): Promise<bool
 
     // Download document stream from Supabase Storage
     try {
-      const { data, error } = await supabaseAdmin.storage
-        .from(BUCKETS.ACADEMIC_DOCUMENTS)
-        .download(resource.storagePath);
+      if (typeof supabaseAdmin?.storage?.from === 'function') {
+        const storageBucket = supabaseAdmin.storage.from(BUCKETS.ACADEMIC_DOCUMENTS);
+        if (typeof storageBucket?.download === 'function') {
+          const { data, error } = await storageBucket.download(resource.storagePath);
 
-      if (error || !data) {
-        console.warn(`[IngestionWorker] Could not download from Supabase Storage (${error?.message}). Using metadata fallback.`);
-      } else {
-        const arrayBuffer = await data.arrayBuffer();
-        fileBuffer = Buffer.from(arrayBuffer);
+          if (error || !data) {
+            console.warn(`[IngestionWorker] Could not download from Supabase Storage (${error?.message}). Using metadata fallback.`);
+          } else {
+            const arrayBuffer = await data.arrayBuffer();
+            fileBuffer = Buffer.from(arrayBuffer);
+          }
+        }
       }
     } catch (storageErr) {
       console.warn('[IngestionWorker] Supabase download notice:', storageErr);
@@ -96,7 +105,7 @@ export async function processDocumentIngestion(resourceId: string): Promise<bool
     return true;
   } catch (err) {
     console.error(`[IngestionWorker] Failed ingesting resource ${resourceId}:`, err);
-    await Resource.findByIdAndUpdate(resourceId, { status: 'needs_review' });
+    await Resource.findByIdAndUpdate(resourceId, { status: 'needs_review' }).catch(() => {});
     return false;
   } finally {
     await cacheService.releaseLock(resourceId);

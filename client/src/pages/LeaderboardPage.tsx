@@ -48,7 +48,7 @@ export const LeaderboardPage: React.FC = () => {
             <Trophy className="w-5 h-5 text-text-secondary" />
             <span>Academic contributor leaderboard</span>
           </h1>
-          <p className="text-[13px] text-text-tertiary">
+          <p className="text-[14px] text-text-tertiary">
             Recognizing scholars and mentors enriching curriculum clarity and doubt resolution
           </p>
         </div>
@@ -64,17 +64,17 @@ export const LeaderboardPage: React.FC = () => {
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="text-[12px] text-text-tertiary">Verified syllabus upload</div>
           <div className="text-[18px] font-semibold text-text-secondary mt-0.5">+10 pts</div>
-          <span className="text-[11px] text-text-tertiary">PDFs, notes, past papers</span>
+          <span className="text-[12px] text-text-tertiary">PDFs, notes, past papers</span>
         </div>
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="text-[12px] text-text-tertiary">Accepted doubt solution</div>
           <div className="text-[18px] font-semibold text-text-secondary mt-0.5">+15 pts</div>
-          <span className="text-[11px] text-text-tertiary">Verified by original asker</span>
+          <span className="text-[12px] text-text-tertiary">Verified by original asker</span>
         </div>
         <div className="p-3 bg-surface-muted border border-border-default rounded-lg">
           <div className="text-[12px] text-text-tertiary">Mentorship session completed</div>
           <div className="text-[18px] font-semibold text-text-secondary mt-0.5">+20 pts</div>
-          <span className="text-[11px] text-text-tertiary">1-on-1 student guidance</span>
+          <span className="text-[12px] text-text-tertiary">1-on-1 student guidance</span>
         </div>
       </div>
 
@@ -118,13 +118,13 @@ export const LeaderboardPage: React.FC = () => {
                     <td className="px-6 py-4 font-semibold text-text-secondary">
                       <div className="flex items-center gap-1.5">
                         {entry.rank === 1 ? (
-                          <Medal className="w-5 h-5 text-yellow-500" />
+                          <Medal className="w-5 h-5 text-accent-strong" />
                         ) : entry.rank === 2 ? (
-                          <Medal className="w-5 h-5 text-slate-400" />
+                          <Medal className="w-5 h-5 text-text-secondary" />
                         ) : entry.rank === 3 ? (
-                          <Medal className="w-5 h-5 text-amber-700" />
+                          <Medal className="w-5 h-5 text-accent-cyan" />
                         ) : (
-                          <span className="text-text-tertiary font-mono text-[13px]">#{entry.rank}</span>
+                          <span className="text-text-tertiary font-mono text-[14px]">#{entry.rank}</span>
                         )}
                       </div>
                     </td>
@@ -145,7 +145,7 @@ export const LeaderboardPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-text-secondary text-[15px]">
+                      <span className="inline-flex items-center gap-1.5 font-semibold text-text-secondary text-[16px]">
                         <Flame className="w-4 h-4 text-text-secondary" />
                         <span>{entry.reputationPoints}</span>
                       </span>

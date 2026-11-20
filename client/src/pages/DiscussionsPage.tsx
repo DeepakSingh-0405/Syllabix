@@ -379,7 +379,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
             <MessageSquare className="w-5 h-5 text-text-secondary" />
             <span>Community doubts & Q&A</span>
           </h1>
-          <p className="text-[13px] text-text-tertiary">
+          <p className="text-[14px] text-text-tertiary">
             Peer problem solving with reputation points (+15 pts for accepted answers)
           </p>
         </div>
@@ -401,7 +401,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
           <button
             type="button"
             onClick={() => setShowAskModal(true)}
-            className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-text-secondary px-space-3 py-1.5 text-[13px] font-medium text-surface-base transition-all hover:opacity-90 active:scale-[0.98] sm:w-auto"
+            className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-text-secondary px-space-3 py-1.5 text-[14px] font-medium text-surface-base transition-all hover:opacity-90 active:scale-[0.98] sm:w-auto"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Ask question</span>
@@ -417,7 +417,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
             <span className="text-text-tertiary text-[12px] uppercase font-medium tracking-wider">
               Doubts ({filteredDiscussions.length})
             </span>
-            <div className="inline-flex items-center gap-1 bg-surface-muted p-0.5 rounded-md border border-border-default text-[11px]">
+            <div className="inline-flex items-center gap-1 bg-surface-muted p-0.5 rounded-md border border-border-default text-[12px]">
               <button
                 type="button"
                 onClick={() => setStatusFilter('all')}
@@ -460,7 +460,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                 <div key={i} className="h-28 bg-surface-muted border border-border-default rounded-md animate-pulse" />
               ))
             ) : filteredDiscussions.length === 0 ? (
-              <div className="p-6 bg-surface-muted border border-border-default rounded-md text-center text-text-tertiary text-[13px]">
+              <div className="p-6 bg-surface-muted border border-border-default rounded-md text-center text-text-tertiary text-[14px]">
                 {statusFilter === 'resolved'
                   ? 'No resolved questions found for this filter.'
                   : statusFilter === 'unresolved'
@@ -486,16 +486,16 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
+                      <span className="font-mono text-[12px] font-semibold text-text-secondary bg-surface-base px-2 py-0.5 rounded border border-border-default">
                         {d.subjectId?.code || 'CS-COURSE'}
                       </span>
                       {isResolved ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
                           <CheckCircle2 className="w-3 h-3 text-accent-green" />
                           <span>Resolved</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary bg-surface-base border border-border-default px-2 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[12px] font-medium text-text-tertiary bg-surface-base border border-border-default px-2 py-0.5 rounded-full">
                           <HelpCircle className="w-3 h-3 text-text-tertiary" />
                           <span>Open ({d.comments?.length || d.commentCount || 0})</span>
                         </span>
@@ -510,7 +510,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                       {d.body}
                     </p>
 
-                    <div className="flex items-center justify-between text-[11px] text-text-tertiary pt-1 border-t border-border-default/50">
+                    <div className="flex items-center justify-between text-[12px] text-text-tertiary pt-1 border-t border-border-default/50">
                       <span>Asked by {d.authorId?.name}</span>
                       <span className="flex items-center gap-1 font-medium text-text-secondary">
                         <ThumbsUp className="w-3 h-3" />
@@ -532,22 +532,22 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
               <div className="p-space-4 border-b border-border-default bg-surface-base space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] font-semibold text-text-secondary bg-surface-interactive px-2 py-0.5 rounded border border-border-default">
+                    <span className="font-mono text-[12px] font-semibold text-text-secondary bg-surface-interactive px-2 py-0.5 rounded border border-border-default">
                       {activeDiscussion.subjectId?.code} — {activeDiscussion.subjectId?.name}
                     </span>
                     {hasAcceptedAnswer ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-accent-green bg-accent-green/10 border border-accent-green/30 px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="w-3 h-3 text-accent-green" />
                         <span>Resolved</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary bg-surface-muted border border-border-default px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[12px] font-medium text-text-tertiary bg-surface-muted border border-border-default px-2 py-0.5 rounded-full">
                         <HelpCircle className="w-3 h-3 text-text-tertiary" />
                         <span>Open Doubt</span>
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] text-text-tertiary flex items-center gap-1">
+                  <span className="text-[12px] text-text-tertiary flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     <span>{new Date(activeDiscussion.createdAt).toLocaleDateString()}</span>
                   </span>
@@ -557,14 +557,14 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                   {activeDiscussion.title}
                 </h2>
 
-                <p className="text-[13px] text-text-primary leading-relaxed whitespace-pre-line font-light">
+                <p className="text-[14px] text-text-primary leading-relaxed whitespace-pre-line font-light">
                   {activeDiscussion.body}
                 </p>
 
                 {activeDiscussion.tags && activeDiscussion.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 pt-1">
                     {activeDiscussion.tags.map((tag, i) => (
-                      <span key={i} className="text-[10px] text-text-tertiary bg-surface-muted px-2 py-0.5 rounded border border-border-default">
+                      <span key={i} className="text-[12px] text-text-tertiary bg-surface-muted px-2 py-0.5 rounded border border-border-default">
                         #{tag}
                       </span>
                     ))}
@@ -580,7 +580,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     {commentsLoading && <Loader2 className="w-3 h-3 animate-spin text-text-tertiary" />}
                   </span>
                   {hasAcceptedAnswer && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-green">
+                    <span className="inline-flex items-center gap-1 text-[12px] font-medium text-accent-green">
                       <CheckCircle2 className="w-3.5 h-3.5 text-accent-green" />
                       <span>Has accepted solution</span>
                     </span>
@@ -588,14 +588,14 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                 </div>
 
                 {hasAcceptedAnswer && (
-                  <div className="p-3 bg-accent-green/10 border border-accent-green/30 rounded-lg flex items-center justify-between gap-3 text-[13px]">
+                  <div className="p-3 bg-accent-green/10 border border-accent-green/30 rounded-lg flex items-center justify-between gap-3 text-[14px]">
                     <div className="flex items-center gap-2 text-text-secondary">
                       <CheckCircle2 className="w-4 h-4 text-accent-green flex-shrink-0" />
                       <span>
                         <strong>Accepted Solution Available</strong> — The author verified the solution highlighted below.
                       </span>
                     </div>
-                    <span className="text-[11px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2 py-0.5 rounded-full">
+                    <span className="text-[12px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2 py-0.5 rounded-full">
                       +15 Rep
                     </span>
                   </div>
@@ -607,7 +607,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     <button
                       type="button"
                       onClick={() => setAcceptError(null)}
-                      className="text-[11px] text-status-error hover:underline ml-2"
+                      className="text-[12px] text-status-error hover:underline ml-2"
                     >
                       Dismiss
                     </button>
@@ -640,20 +640,20 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="text-[13px] font-semibold text-text-secondary">
+                            <span className="text-[14px] font-semibold text-text-secondary">
                               {comment.authorId?.name}
                             </span>
-                            <span className="text-[10px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-base rounded border border-border-default">
+                            <span className="text-[12px] uppercase font-semibold text-text-tertiary px-1.5 py-0.2 bg-surface-base rounded border border-border-default">
                               {comment.authorId?.role || 'student'}
                             </span>
                             {comment.authorId?.reputationPoints !== undefined && (
-                              <span className="text-[11px] font-medium text-text-tertiary">
+                              <span className="text-[12px] font-medium text-text-tertiary">
                                 {comment.authorId.reputationPoints} pts
                               </span>
                             )}
                           </div>
                           {comment.isAcceptedAnswer ? (
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2.5 py-0.5 rounded-full shadow-sm">
+                            <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-accent-green bg-surface-base border border-accent-green/30 px-2.5 py-0.5 rounded-full shadow-sm">
                               <CheckCircle2 className="w-3.5 h-3.5 text-accent-green" />
                               <span>Accepted Solution (+15 pts)</span>
                             </span>
@@ -662,7 +662,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                               type="button"
                               onClick={() => handleAcceptAnswer(comment._id)}
                               disabled={acceptingCommentId !== null}
-                              className="inline-flex items-center gap-1 text-[11px] font-medium text-text-tertiary hover:text-text-secondary bg-surface-base hover:bg-surface-elevated border border-border-default hover:border-border-interactive px-2 py-0.5 rounded-full transition-colors disabled:opacity-40"
+                              className="inline-flex items-center gap-1 text-[12px] font-medium text-text-tertiary hover:text-text-secondary bg-surface-base hover:bg-surface-elevated border border-border-default hover:border-border-interactive px-2 py-0.5 rounded-full transition-colors disabled:opacity-40"
                               title="Accept this answer as the verified solution (+15 reputation points)"
                             >
                               {acceptingCommentId === comment._id ? (
@@ -680,11 +680,11 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                           ) : null}
                         </div>
 
-                        <p className="text-[13px] text-text-primary leading-relaxed whitespace-pre-line font-light">
+                        <p className="text-[14px] text-text-primary leading-relaxed whitespace-pre-line font-light">
                           {comment.body}
                         </p>
 
-                        <div className="flex items-center justify-between pt-1 text-[11px] text-text-tertiary border-t border-border-default/40">
+                        <div className="flex items-center justify-between pt-1 text-[12px] text-text-tertiary border-t border-border-default/40">
                           <span>{new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           <span className="flex items-center gap-1 text-text-secondary">
                             <ThumbsUp className="w-3 h-3" />
@@ -695,7 +695,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                     );
                   })
                 ) : (
-                  <div className="py-8 text-center text-text-tertiary text-[13px]">
+                  <div className="py-8 text-center text-text-tertiary text-[14px]">
                     No answers submitted yet. Be the first to help your fellow students!
                   </div>
                 )}
@@ -711,12 +711,12 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Post an academic explanation or proof..."
-                  className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[13px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
+                  className="flex-1 bg-surface-muted border border-border-interactive text-text-secondary text-[14px] px-space-3 py-2 rounded-md placeholder:text-text-disabled focus-visible:ring-2 focus-visible:ring-border-interactive outline-none"
                 />
                 <button
                   type="submit"
                   disabled={submittingComment || !commentText.trim()}
-                  className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[13px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
+                  className="inline-flex items-center gap-1.5 bg-text-secondary text-surface-base font-medium text-[14px] px-space-3 py-2 rounded-md hover:opacity-90 disabled:opacity-40 transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Answer</span>
@@ -788,7 +788,7 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                   value={newBody}
                   onChange={(e) => setNewBody(e.target.value)}
                   placeholder="Describe where you are stuck, boundary cases, or specific exam question details..."
-                  className="w-full bg-surface-base text-text-secondary text-[13px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2 resize-none"
+                  className="w-full bg-surface-base text-text-secondary text-[14px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2 resize-none"
                 />
               </div>
 
@@ -809,14 +809,14 @@ export const DiscussionsPage: React.FC<DiscussionsPageProps> = ({ subjects }) =>
                 <button
                   type="button"
                   onClick={() => setShowAskModal(false)}
-                  className="px-4 py-2 rounded-md bg-surface-base text-text-secondary border border-border-default hover:bg-surface-interactive text-[13px] font-medium transition-colors"
+                  className="px-4 py-2 rounded-md bg-surface-base text-text-secondary border border-border-default hover:bg-surface-interactive text-[14px] font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={asking}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-text-secondary text-surface-base text-[13px] font-medium hover:opacity-90 disabled:opacity-50 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-text-secondary text-surface-base text-[14px] font-medium hover:opacity-90 disabled:opacity-50 transition-all"
                 >
                   {asking ? 'Posting...' : 'Post question'}
                 </button>

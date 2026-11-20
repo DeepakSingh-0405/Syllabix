@@ -53,14 +53,14 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
             onClick={() => onSelectSubject(null)}
             onKeyDown={(e) => handleKeyDown(e, 0)}
             tabIndex={selectedSubject === null ? 0 : -1}
-            className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[13px] transition-all duration-fast ${
+            className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[14px] transition-all duration-fast ${
               selectedSubject === null
                 ? 'bg-surface-interactive text-text-secondary border border-text-secondary font-medium'
                 : 'bg-transparent text-text-primary border border-border-default hover:bg-surface-interactive hover:text-text-secondary hover:border-text-tertiary'
             }`}
           >
             <span>All subjects</span>
-            <span className="text-[11px] text-text-tertiary">({totalCount})</span>
+            <span className="text-[12px] text-text-tertiary">({totalCount})</span>
           </button>
         </li>
 
@@ -75,14 +75,14 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                 onClick={() => onSelectSubject(isSelected ? null : sub.code)}
                 onKeyDown={(e) => handleKeyDown(e, idx + 1)}
                 tabIndex={isSelected ? 0 : -1}
-                className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[13px] transition-all duration-fast ${
+                className={`inline-flex h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 text-[14px] transition-all duration-fast ${
                   isSelected
                     ? 'bg-surface-interactive text-text-secondary border border-text-secondary font-medium'
                     : 'bg-transparent text-text-primary border border-border-default hover:bg-surface-interactive hover:text-text-secondary hover:border-text-tertiary'
                 }`}
               >
                 <span>{sub.name}</span>
-                <span className="text-[11px] text-text-tertiary">({sub.count})</span>
+                <span className="text-[12px] text-text-tertiary">({sub.count})</span>
               </button>
             </li>
           );

@@ -330,7 +330,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         </div>
 
         {error && (
-          <div className="mb-4 p-space-3 bg-status-errorSurface border border-status-error rounded-md text-status-error text-[13px] flex items-center justify-between gap-2">
+          <div className="mb-4 p-space-3 bg-status-errorSurface border border-status-error rounded-md text-status-error text-[12px] flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
@@ -339,7 +339,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               type="button"
               onClick={() => handleSubmit()}
               disabled={uploading}
-              className="px-2.5 py-1 rounded bg-surface-base border border-status-error text-[11px] font-medium hover:bg-surface-interactive transition-colors shrink-0 flex items-center gap-1"
+              className="px-2.5 py-1 rounded bg-surface-base border border-status-error text-[12px] font-medium hover:bg-surface-interactive transition-colors shrink-0 flex items-center gap-1"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Retry</span>
@@ -366,7 +366,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         )}
 
         {!uploading && statusMessage && (
-          <div className="mb-4 p-space-3 bg-surface-base border border-border-interactive rounded-md text-text-secondary text-[13px] flex items-center gap-2">
+          <div className="mb-4 p-space-3 bg-surface-base border border-border-interactive rounded-md text-text-secondary text-[14px] flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-accent-green shrink-0" />
             <span>{statusMessage}</span>
           </div>
@@ -375,7 +375,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-space-3">
           {/* Document Title */}
           <div>
-            <label className="block text-[13px] font-medium text-text-tertiary mb-1">
+            <label className="block text-[12px] font-medium text-text-tertiary mb-1">
               Document title
             </label>
             <input
@@ -391,14 +391,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           {/* Academic Subject (Manual entry vs Preset selection) */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-[13px] font-medium text-text-tertiary">
+              <label className="block text-[12px] font-medium text-text-tertiary">
                 Academic subject
               </label>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setIsManualSubject(true)}
-                  className={`px-2 py-0.5 text-[11px] rounded transition-colors flex items-center gap-1 ${
+                  className={`px-2 py-0.5 text-[12px] rounded transition-colors flex items-center gap-1 ${
                     isManualSubject
                       ? 'bg-surface-interactive text-text-secondary border border-border-interactive'
                       : 'text-text-tertiary hover:text-text-secondary'
@@ -410,7 +410,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsManualSubject(false)}
-                  className={`px-2 py-0.5 text-[11px] rounded transition-colors flex items-center gap-1 ${
+                  className={`px-2 py-0.5 text-[12px] rounded transition-colors flex items-center gap-1 ${
                     !isManualSubject
                       ? 'bg-surface-interactive text-text-secondary border border-border-interactive'
                       : 'text-text-tertiary hover:text-text-secondary'
@@ -431,7 +431,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     value={manualSubjectName}
                     onChange={(e) => setManualSubjectName(e.target.value)}
                     placeholder="Subject name (e.g. Software Engineering)"
-                    className="w-full bg-surface-base text-text-secondary text-[13px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2"
+                    className="w-full bg-surface-base text-text-secondary text-[14px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2"
                   />
                 </div>
                 <div>
@@ -440,7 +440,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     value={manualSubjectCode}
                     onChange={(e) => setManualSubjectCode(e.target.value)}
                     placeholder="Course code (e.g. SE-301)"
-                    className="w-full bg-surface-base text-text-secondary text-[13px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2"
+                    className="w-full bg-surface-base text-text-secondary text-[14px] px-3 py-2 rounded-md border border-border-interactive focus-visible:ring-2"
                   />
                 </div>
               </div>
@@ -457,14 +457,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 ))}
               </select>
             )}
-            <p className="text-[11px] text-text-tertiary mt-1">
+            <p className="text-[12px] text-text-tertiary mt-1">
               Enter any university subject freely — Syllabix dynamically indexes new courses into the curriculum directory.
             </p>
           </div>
 
           {/* Resource Type */}
           <div>
-            <label className="block text-[13px] font-medium text-text-tertiary mb-1">
+            <label className="block text-[12px] font-medium text-text-tertiary mb-1">
               Category
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -487,20 +487,20 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
           {/* File Picker */}
           <div>
-            <label className="block text-[13px] font-medium text-text-tertiary mb-1">
+            <label className="block text-[12px] font-medium text-text-tertiary mb-1">
               Syllabus PDF / document file
             </label>
             <input
               type="file"
               accept=".pdf,.docx,.pptx,.txt"
               onChange={handleFileChange}
-              className="w-full text-[13px] text-text-tertiary file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-medium file:bg-surface-interactive file:text-text-secondary hover:file:cursor-pointer"
+              className="w-full text-[12px] text-text-tertiary file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[12px] file:font-medium file:bg-surface-interactive file:text-text-secondary hover:file:cursor-pointer"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-[13px] font-medium text-text-tertiary mb-1">
+            <label className="block text-[12px] font-medium text-text-tertiary mb-1">
               Description / Notes (optional)
             </label>
             <textarea

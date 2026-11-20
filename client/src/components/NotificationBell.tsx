@@ -111,7 +111,7 @@ export const NotificationBell: React.FC = () => {
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
           <span
-            className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-surface-interactive border border-border-interactive text-text-secondary text-[11px] font-semibold flex items-center justify-center leading-none shadow-sm"
+            className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-surface-interactive border border-border-interactive text-text-secondary text-[12px] font-semibold flex items-center justify-center leading-none shadow-sm"
             aria-hidden="true"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -127,7 +127,7 @@ export const NotificationBell: React.FC = () => {
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="inline-flex items-center gap-1 text-[11px] text-text-tertiary hover:text-text-secondary"
+                className="inline-flex items-center gap-1 text-[12px] text-text-tertiary hover:text-text-secondary"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 <span>Mark all read</span>
@@ -149,7 +149,7 @@ export const NotificationBell: React.FC = () => {
                       : 'bg-surface-interactive border-border-interactive text-text-secondary font-medium'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 mb-1 text-[11px]">
+                  <div className="flex items-center gap-1.5 mb-1 text-[12px]">
                     {n.type === 'answer_accepted' ? (
                       <Award className="w-3.5 h-3.5 text-text-secondary" />
                     ) : (
@@ -158,7 +158,7 @@ export const NotificationBell: React.FC = () => {
                     <span className="font-semibold text-text-secondary">{n.title}</span>
                   </div>
                   <p className="leading-relaxed">{n.message}</p>
-                  <span className="text-[11px] text-text-disabled mt-1.5 block">
+                  <span className="text-[12px] text-text-disabled mt-1.5 block">
                     {new Date(n.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
