@@ -38,11 +38,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         onClose();
       } else if (mode === 'signup') {
         await signUpWithPassword(email, password, fullName);
-        setSuccessMessage('Account created! Please check your email for confirmation or sign in directly.');
-        setMode('signin');
+        onClose();
       } else if (mode === 'magic') {
         await signInWithEmailOtp(email);
         setSuccessMessage('Magic login link dispatched to your email address.');
+        onClose();
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please verify credentials.');

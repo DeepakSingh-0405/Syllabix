@@ -48,6 +48,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - **ADR-001 (Port 5001 Resolution):** Backend defaults to port `5001` (with `process.env.PORT` override) to prevent macOS port `5000` AirPlay collisions.
 - **ADR-002 (Inertial Smooth Scrolling & Dialog Boundary):** Lenis integrated with `allowNestedScroll: true` and `data-lenis-prevent` on modals/drawers, accompanied by `useBodyScrollLock` to prevent scrollbar layout shifts.
 - **ADR-003 (Deterministic Fallback Engine):** Gemini AI routes include offline curriculum synthesis so students can revise even during API outages or quota limits.
+- **ADR-004 (Offline & Mock Auth Fallback):** When remote Supabase credentials are not configured or unreachable in development, AuthContext automatically bootstraps valid local sessions and binds `demo-bearer-token` / `demo-mentor-bearer-token` to requests, ensuring seamless sign-in, sign-up, and role switching without network timeouts.
 
 ---
 

@@ -52,17 +52,7 @@ export function isBackendUnavailableError(err: unknown): boolean {
  * and local demo session storage with expiration validation.
  */
 export async function getAuthToken(): Promise<string | null> {
-  // 1. Check active Supabase session
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.access_token) {
-      return session.access_token;
-    }
-  } catch {
-    // Supabase offline / error fallback
-  }
-
-  // 2. Check local demo session if available
+  // 1. Check active local demo / mock session first if present
   if (typeof window !== 'undefined' && window.localStorage) {
     try {
       const savedDemo = localStorage.getItem('syllabix_demo_session');
@@ -72,14 +62,24 @@ export async function getAuthToken(): Promise<string | null> {
           const expiresAt = parsed.session.expires_at;
           if (expiresAt && Date.now() / 1000 > expiresAt) {
             localStorage.removeItem('syllabix_demo_session');
-            return null;
+          } else {
+            return parsed.session.access_token;
           }
-          return parsed.session.access_token;
         }
       }
     } catch {
       // Corrupted JSON in localStorage
     }
+  }
+
+  // 2. Check active Supabase session
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      return session.access_token;
+    }
+  } catch {
+    // Supabase offline / error fallback
   }
 
   return null;

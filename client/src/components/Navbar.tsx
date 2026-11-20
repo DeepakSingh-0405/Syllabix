@@ -101,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload, onOpenAuth }) => {
                 </span>
                 <button
                   type="button"
-                  onClick={signOut}
+                  onClick={() => signOut()}
                   title="Sign out"
                   aria-label="Sign out"
                   className="nav-icon-button"
@@ -147,6 +147,44 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenUpload, onOpenAuth }) => {
                 <span>{label}</span>
               </NavLink>
             ))}
+
+            <div className="pt-3 border-t border-border-default mt-2">
+              {session ? (
+                <div className="flex items-center justify-between px-2 py-1.5">
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <span className="text-[13px] text-text-secondary font-medium truncate">
+                      {profile?.name || session.user.email?.split('@')[0]}
+                    </span>
+                    <span className="text-[11px] text-text-tertiary truncate">
+                      {session.user.email}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      signOut();
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-status-errorSurface border border-status-error/30 text-status-error text-[12px] font-medium hover:opacity-80 transition-opacity"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onOpenAuth();
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-interactive text-text-secondary text-[13px] font-medium border border-border-interactive hover:bg-surface-elevated transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign in</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
       </header>

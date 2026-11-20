@@ -9,7 +9,7 @@ export interface AuthenticatedRequest extends Request {
   supabaseUser?: any;
 }
 
-const ALLOWED_DEMO_TOKENS = new Set(['demo-bearer-token']);
+const ALLOWED_DEMO_TOKENS = new Set(['demo-bearer-token', 'demo-mentor-bearer-token']);
 
 export const isDemoToken = (token: string): boolean => {
   return ALLOWED_DEMO_TOKENS.has(token);
@@ -60,25 +60,35 @@ export const verifySupabaseToken = async (
         return;
       }
 
-      const demoId = 'demo-student-id-001';
+      const isMentor = token === 'demo-mentor-bearer-token';
+      const demoId = isMentor ? 'demo-mentor-id-001' : 'demo-student-id-001';
+      const demoEmail = isMentor ? 'mentor@syllabix.edu' : 'student@syllabix.edu';
+      const demoName = isMentor ? 'Prof. Aryan Sharma (Mentor)' : 'Aarav Mehta (Student)';
+      const demoRole = isMentor ? 'mentor' : 'student';
+
       let demoUser: any = null;
       try {
         demoUser = await User.findOne({ supabaseUserId: demoId });
         if (!demoUser) {
           demoUser = await User.create({
-            _id: new mongoose.Types.ObjectId('650000000000000000000001'),
+            _id: new mongoose.Types.ObjectId(isMentor ? '650000000000000000000002' : '650000000000000000000001'),
             supabaseUserId: demoId,
-            email: 'student@syllabix.edu',
-            name: 'Aarav Mehta (Student)',
-            role: 'student',
-            reputationPoints: 120,
+            email: demoEmail,
+            name: demoName,
+            role: demoRole,
+            reputationPoints: isMentor ? 240 : 120,
           }).catch(() => null);
         }
       } catch {
         // Database offline in unit tests / startup
       }
-      req.supabaseUser = { id: demoId, email: 'student@syllabix.edu' };
-      req.user = demoUser || ({ _id: new mongoose.Types.ObjectId('650000000000000000000001'), name: 'Aarav Mehta (Student)', role: 'student', reputationPoints: 120 } as any);
+      req.supabaseUser = { id: demoId, email: demoEmail };
+      req.user = demoUser || ({
+        _id: new mongoose.Types.ObjectId(isMentor ? '650000000000000000000002' : '650000000000000000000001'),
+        name: demoName,
+        role: demoRole,
+        reputationPoints: isMentor ? 240 : 120,
+      } as any);
       next();
       return;
     }
@@ -155,23 +165,35 @@ export const optionalSupabaseToken = async (
         if (!isDemoAuthenticationPermitted()) {
           return next();
         }
+        const isMentor = token === 'demo-mentor-bearer-token';
+        const demoId = isMentor ? 'demo-mentor-id-001' : 'demo-student-id-001';
+        const demoEmail = isMentor ? 'mentor@syllabix.edu' : 'student@syllabix.edu';
+        const demoName = isMentor ? 'Prof. Aryan Sharma (Mentor)' : 'Aarav Mehta (Student)';
+        const demoRole = isMentor ? 'mentor' : 'student';
+
         let demoUser: any = null;
         try {
-          demoUser = await User.findOne({ supabaseUserId: 'demo-student-id-001' });
+          demoUser = await User.findOne({ supabaseUserId: demoId });
           if (!demoUser) {
             demoUser = await User.create({
-              _id: new mongoose.Types.ObjectId('650000000000000000000001'),
-              supabaseUserId: 'demo-student-id-001',
-              email: 'student@syllabix.edu',
-              name: 'Aarav Mehta (Student)',
-              role: 'student',
-              reputationPoints: 120,
+              _id: new mongoose.Types.ObjectId(isMentor ? '650000000000000000000002' : '650000000000000000000001'),
+              supabaseUserId: demoId,
+              email: demoEmail,
+              name: demoName,
+              role: demoRole,
+              reputationPoints: isMentor ? 240 : 120,
             }).catch(() => null);
           }
         } catch {
           // DB offline fallback
         }
-        req.user = demoUser || ({ _id: new mongoose.Types.ObjectId('650000000000000000000001'), name: 'Aarav Mehta (Student)', role: 'student', reputationPoints: 120 } as any);
+        req.supabaseUser = { id: demoId, email: demoEmail };
+        req.user = demoUser || ({
+          _id: new mongoose.Types.ObjectId(isMentor ? '650000000000000000000002' : '650000000000000000000001'),
+          name: demoName,
+          role: demoRole,
+          reputationPoints: isMentor ? 240 : 120,
+        } as any);
         return next();
       }
       try {
