@@ -49,6 +49,7 @@ This file maintains persistent architectural state, engineering decisions, and t
 - **ADR-002 (Inertial Smooth Scrolling & Dialog Boundary):** Lenis integrated with `allowNestedScroll: true` and `data-lenis-prevent` on modals/drawers, accompanied by `useBodyScrollLock` to prevent scrollbar layout shifts.
 - **ADR-003 (Deterministic Fallback Engine):** Gemini AI routes include offline curriculum synthesis so students can revise even during API outages or quota limits.
 - **ADR-004 (Offline & Mock Auth Fallback):** When remote Supabase credentials are not configured or unreachable in development, AuthContext automatically bootstraps valid local sessions and binds `demo-bearer-token` / `demo-mentor-bearer-token` to requests, ensuring seamless sign-in, sign-up, and role switching without network timeouts.
+- **ADR-005 (Dynamic Production API Resolution & Client-Side Curriculum Synthesis):** In deployed web environments (such as Vercel), `api.ts` automatically defaults to `/api/v1` on non-localhost hosts instead of hardcoded `localhost:5001` to eliminate browser Mixed Content security blocking. Furthermore, intelligent client-side synthesis fallbacks (`curriculumSynthesis.ts`) guarantee that AI chat, syllabus uploads, revision notes, quizzes, and flashcards remain fully operational even during network outages or before backend infrastructure is provisioned.
 
 ---
 

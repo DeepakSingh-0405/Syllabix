@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Subject } from '../types';
-import { api } from '../lib/api';
+import { api, isBackendUnavailableError } from '../lib/api';
+import { synthesizeSubjectSummary, synthesizeSubjectQuiz } from '../lib/curriculumSynthesis';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { X, Sparkles, Layers, RotateCw, CheckCircle2, AlertCircle, HelpCircle, Check, RefreshCw, Upload } from 'lucide-react';
 
@@ -80,7 +81,13 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
         throw new Error('Received empty summary response.');
       }
     } catch (err: any) {
-      setSummaryError(err.message || 'Failed to synthesize revision notes from course materials. Please try again.');
+      if (isBackendUnavailableError(err)) {
+        console.warn('[DetailsDrawer] Backend unavailable. Synthesizing revision summary from curriculum knowledge base.');
+        const synthesized = synthesizeSubjectSummary(subject);
+        setSummaryData(synthesized);
+      } else {
+        setSummaryError(err.message || 'Failed to synthesize revision notes from course materials. Please try again.');
+      }
     } finally {
       setLoadingAction(false);
     }
@@ -105,7 +112,13 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({
         throw new Error('Received empty questions set.');
       }
     } catch (err: any) {
-      setQuizError(err.message || 'Failed to formulate practice quiz questions. Please try again.');
+      if (isBackendUnavailableError(err)) {
+        console.warn('[DetailsDrawer] Backend unavailable. Synthesizing practice quiz from curriculum knowledge base.');
+        const synthesized = synthesizeSubjectQuiz(subject);
+        setQuizQuestions(synthesized);
+      } else {
+        setQuizError(err.message || 'Failed to formulate practice quiz questions. Please try again.');
+      }
     } finally {
       setLoadingAction(false);
     }

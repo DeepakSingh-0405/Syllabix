@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api } from '../lib/api';
+import { api, isBackendUnavailableError } from '../lib/api';
 import { Subject, AIResponse, AICitation } from '../types';
 import { CitationViewerModal } from '../components/CitationViewerModal';
+import { synthesizeAssistantAnswer } from '../lib/curriculumSynthesis';
 import {
   Sparkles,
   Send,
@@ -252,13 +253,29 @@ export const AssistantPage: React.FC<AssistantPageProps> = ({ subjects }) => {
         role: 'assistant',
         content: data.answer,
         citations: data.citations || [],
-        model: data.model || 'gemini-3.8-flash',
+        model: data.model || 'gemini-1.5-flash',
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err: any) {
-      setError(err.message || 'Failed to generate answer. Please verify backend connection.');
+      if (isBackendUnavailableError(err)) {
+        console.warn('[AssistantPage] Backend unreachable. Synthesizing answer client-side via curriculum knowledge base.');
+        const synthesized = synthesizeAssistantAnswer(text.trim(), activeSubject, currentDoc);
+        const assistantMessage: ChatMessage = {
+          id: 'ai-' + Date.now(),
+          role: 'assistant',
+          content: synthesized.answer,
+          citations: synthesized.citations,
+          model: synthesized.model,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+        setUploadNotice('Offline curriculum synthesis active. Responses grounded in course syllabus.');
+        setError(null);
+      } else {
+        setError(err.message || 'Failed to generate answer. Please verify backend connection.');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,24 @@
 import { supabase } from './supabase';
 
-const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) || 'http://localhost:5001/api/v1';
+export const getApiBaseUrl = (): string => {
+  const envUrl = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_API_BASE_URL : undefined;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return envUrl.trim();
+  }
+  // When running in browser on a deployed host (e.g. *.vercel.app, *.pages.dev, etc.)
+  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+    const isLocalhost =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '0.0.0.0';
+    if (!isLocalhost) {
+      return '/api/v1';
+    }
+  }
+  return 'http://localhost:5001/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Standardized error class for client API requests.

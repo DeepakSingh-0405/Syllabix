@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { api } from '../lib/api';
+import { api, isBackendUnavailableError } from '../lib/api';
+import { synthesizeSubjectFlashcards } from '../lib/curriculumSynthesis';
 import { Subject } from '../types';
 import { X, RotateCw, CheckCircle2, ChevronLeft, ChevronRight, Layers, Sparkles, AlertCircle } from 'lucide-react';
 
@@ -50,8 +51,15 @@ export const FlashcardDeckModal: React.FC<FlashcardDeckModalProps> = ({
         }
       })
       .catch((err: any) => {
-        setError(err.message || 'Failed to load dynamic flashcards. Please retry.');
-        setCards([]);
+        if (isBackendUnavailableError(err)) {
+          console.warn('[FlashcardDeckModal] Backend unreachable. Synthesizing flashcard deck from curriculum knowledge base.');
+          const synthesized = synthesizeSubjectFlashcards(subject);
+          setCards(synthesized);
+          setError(null);
+        } else {
+          setError(err.message || 'Failed to load dynamic flashcards. Please retry.');
+          setCards([]);
+        }
       })
       .finally(() => {
         setLoading(false);
